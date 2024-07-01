@@ -1,7 +1,11 @@
+import urllib
 from urllib.error import HTTPError
+
+import certifi
 import numpy as np
 import pandas as pd
 import config.league as LEAGUE
+import io
 
 
 def preprocessing_season(season_df, n_season, league_name):
@@ -16,13 +20,20 @@ def preprocessing_season(season_df, n_season, league_name):
 
     return data
 
+
 def _extract_season_data(path, season_i, league_name):
     loading = False
 
-    while(loading == False):
+    context = urllib.request.ssl.create_default_context(cafile=certifi.where())
+
+    while not loading:
         try:
-            season_df = pd.read_csv(path, index_col=0)
-            loading = True
+            with urllib.request.urlopen(path, context=context) as response:
+                data = response.read().decode('utf-8')
+                season_df = pd.read_csv(io.StringIO(data))
+
+                # season_df = pd.read_csv(path, index_col=0)
+                loading = True
         except HTTPError as err:
             print(f'Http error: {err}')
 
@@ -37,12 +48,11 @@ def _extract_season_data(path, season_i, league_name):
 
 
 def extract_data(league_name):
-
     league_df = pd.DataFrame()
 
     for season_i, path in enumerate(LEAGUE.LEAGUE_PATHS[league_name]):
         season_df = _extract_season_data(path, season_i, league_name)
-        league_df = league_df.append(season_df, sort=False)
-        league_df = league_df.reset_index(drop=True)
+        league_df = pd.concat((league_df, season_df), axis=0)
+        # league_df = league_df.reset_index(drop=True)
 
     return league_df

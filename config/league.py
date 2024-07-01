@@ -4,17 +4,11 @@
 SERIE_A = 'serie_a'
 SERIE_A_ID = 2019
 
-SERIE_A_PATH = ['https://www.football-data.co.uk/mmz4281/1011/I1.csv',
-               'https://www.football-data.co.uk/mmz4281/1112/I1.csv',
-               'https://www.football-data.co.uk/mmz4281/1213/I1.csv',
-               'https://www.football-data.co.uk/mmz4281/1314/I1.csv',
-               'https://www.football-data.co.uk/mmz4281/1415/I1.csv',
-               'https://www.football-data.co.uk/mmz4281/1516/I1.csv',
-               'https://www.football-data.co.uk/mmz4281/1617/I1.csv',
-               'https://www.football-data.co.uk/mmz4281/1718/I1.csv',
-               'https://www.football-data.co.uk/mmz4281/1819/I1.csv',
+SERIE_A_PATH = ['https://www.football-data.co.uk/mmz4281/1819/I1.csv',
                'https://www.football-data.co.uk/mmz4281/1920/I1.csv',
-               'https://www.football-data.co.uk/mmz4281/2021/I1.csv']
+               'https://www.football-data.co.uk/mmz4281/2021/I1.csv',
+                'https://www.football-data.co.uk/mmz4281/2223/I1.csv',
+                'https://www.football-data.co.uk/mmz4281/2324/I1.csv']
 
 PARMA = 'Parma'
 FIORENTINA = 'Fiorentina'
