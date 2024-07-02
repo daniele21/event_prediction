@@ -7,21 +7,11 @@ import pandas as pd
 import config.league as LEAGUE
 import io
 
-
-def preprocessing_season(season_df, n_season, league_name):
-    data = season_df.copy(deep=True)
-
-    data.insert(0, 'season', n_season)
-    data.insert(0, 'league', league_name)
-    data.insert(2, 'match_n', np.arange(1, len(data) + 1, 1))
-    # data = _addRound(data)
-
-    data['Date'] = pd.to_datetime(data['Date'], dayfirst=True)
-
-    return data
+from core.preprocessing.league_preprocessing import feature_engineering_league
+from core.preprocessing.season import preprocessing_season
 
 
-def _extract_season_data(path, season_i, league_name):
+def extract_season_data(path, season_i, league_name):
     loading = False
 
     context = urllib.request.ssl.create_default_context(cafile=certifi.where())
@@ -47,12 +37,14 @@ def _extract_season_data(path, season_i, league_name):
     return season_df
 
 
-def extract_data(league_name):
+def extract_data(league_name, n_prev_match):
     league_df = pd.DataFrame()
 
     for season_i, path in enumerate(LEAGUE.LEAGUE_PATHS[league_name]):
-        season_df = _extract_season_data(path, season_i, league_name)
+        season_df = extract_season_data(path, season_i, league_name)
         league_df = pd.concat((league_df, season_df), axis=0)
-        # league_df = league_df.reset_index(drop=True)
+        league_df = league_df.reset_index(drop=True)
+
+    league_df = feature_engineering_league(league_df, n_prev_match)
 
     return league_df
