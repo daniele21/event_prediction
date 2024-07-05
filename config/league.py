@@ -7,6 +7,7 @@ SERIE_A_ID = 2019
 SERIE_A_PATH = ['https://www.football-data.co.uk/mmz4281/1819/I1.csv',
                 'https://www.football-data.co.uk/mmz4281/1920/I1.csv',
                 'https://www.football-data.co.uk/mmz4281/2021/I1.csv',
+                'https://www.football-data.co.uk/mmz4281/2122/I1.csv',
                 'https://www.football-data.co.uk/mmz4281/2223/I1.csv',
                 'https://www.football-data.co.uk/mmz4281/2324/I1.csv']
 
