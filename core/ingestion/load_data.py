@@ -1,4 +1,4 @@
-import urllib
+import urllib.request
 from urllib.error import HTTPError
 
 import certifi
@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 import config.league as LEAGUE
 import io
+import os
+import logging
+
 
 from core.preprocessing.league_preprocessing import feature_engineering_league
 from core.preprocessing.season import preprocessing_season
@@ -13,6 +16,7 @@ from core.preprocessing.season import preprocessing_season
 
 def extract_season_data(path, season_i, league_name):
     loading = False
+
 
     context = urllib.request.ssl.create_default_context(cafile=certifi.where())
 

@@ -7,11 +7,11 @@ def update_data_league(params):
     league_name = params['league_name']
     npm = params['n_prev_match']
 
-    league_csv, input_data = extract_data_league(params)
+    league_csv = extract_data_league(params)
     last_date = league_csv.iloc[-1]['Date']
 
     logger.info(f'> Updating {league_name} npm={npm} at date {last_date}')
-
+    return league_csv
 
 def extract_data_league(params):
     db_manager = DatabaseManager(params)

@@ -2,7 +2,8 @@ from os.path import exists
 
 import pandas as pd
 
-
+from pathlib import Path
+import os
 import config.league as LEAGUE
 
 from config.data_path import get_league_csv_paths
@@ -31,6 +32,7 @@ class DatabaseManager:
             if league_dir is not None else None
 
         # LEAGUE CSV ALREADY EXISTING
+        print(league_path)
         if league_path is not None and exists(league_path):
             league_df = pd.read_csv(league_path, index_col=0)
             league_df = update_league_data(league_df, n_prev_match) if update else league_df
@@ -40,6 +42,14 @@ class DatabaseManager:
         # GENERATING LEAGUE CSV
         else:
             league_df = extract_data(league_name, n_prev_match)
+
+            parent = Path(league_path).parent
+            if not parent.is_dir():
+                os.makedirs(parent, exist_ok=True)
+                print(f"Created directory: '{parent}'")
+            else:
+                print(f"Directory already exists: '{parent}'")
+            print(f"Absolute path: {Path(league_path).resolve()}")
             logger.info(f'Saving data at {league_path}')
             league_df.to_csv(league_path)
 
