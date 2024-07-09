@@ -9,6 +9,7 @@ import config.league as LEAGUE
 from config.data_path import get_league_csv_paths
 from core.ingestion.load_data import extract_data, extract_season_data
 from core.logger import logger
+from core.preprocessing.data_shift import shift_data_features
 from core.preprocessing.league_preprocessing import feature_engineering_league
 from core.time_decorator import timing
 
@@ -36,12 +37,14 @@ class DatabaseManager:
         if league_path is not None and exists(league_path):
             league_df = pd.read_csv(league_path, index_col=0)
             league_df = update_league_data(league_df, n_prev_match) if update else league_df
+            league_df = shift_data_features(league_df)
             logger.info('> Updating league data')
             league_df.to_csv(league_path)
 
         # GENERATING LEAGUE CSV
         else:
             league_df = extract_data(league_name, n_prev_match)
+            league_df = shift_data_features(league_df)
 
             parent = Path(league_path).parent
             if not parent.is_dir():
