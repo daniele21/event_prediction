@@ -304,7 +304,7 @@ def calculate_accuracy(file_name):
 import pandas as pd
 
 
-def calculate_gains_losses(file_path, amount):
+def calculate_gains_losses(file_path, amount,min_prob):
     path = f'./predictions_file/{file_path}'
 
     df = pd.read_csv(path)
@@ -318,14 +318,46 @@ def calculate_gains_losses(file_path, amount):
     for index, row in df.iterrows():
         prediction = row['Predicted']
         correct = row['Correct']
+        A_win_prob = row['A_win_prob']
+        A_draw_prob = row['A_draw_prob']
+        A_loss_prob = row['A_loss_prob']
 
         # Find the column name based on the prediction
         gt_column = f"GT_{prediction}"
+
 
         if gt_column in row:
             odds = row[gt_column]
         else:
             continue  # Skip if the column is not found
+        if prediction == '1':
+
+           if A_win_prob < min_prob:
+               continue
+        if prediction == 'X':
+           if A_draw_prob < min_prob:
+               continue
+
+        if prediction == '2':
+           if A_loss_prob < min_prob:
+               continue
+
+        if prediction == '1X':
+            one_draw = A_win_prob + A_draw_prob
+            if one_draw < min_prob:
+                continue
+
+        if prediction == 'X2':
+            two_draw = A_loss_prob + A_draw_prob
+            if two_draw < min_prob:
+                continue
+
+        if prediction == '12':
+            one_two = A_win_prob + A_loss_prob
+            if one_two < min_prob:
+                continue
+
+
 
         total_spent += amount
 
@@ -338,8 +370,81 @@ def calculate_gains_losses(file_path, amount):
     print(f"Total gain: {gain}")
     print(f"Total loss: {loss}")
     print(f"Total spent: {total_spent}")
+    print(f"loss percentage: {loss/total_spent}")
+    print(f"gain percentage: {(gain- total_spent) / total_spent}")
 
 
+
+
+def kelly_calculate_gains_losses(file_path, amount,min_prob):
+    path = f'./predictions_file/{file_path}'
+
+    df = pd.read_csv(path)
+
+    # Initialize variables
+    gain = 0
+    loss = 0
+    total_spent = 0
+
+    # Iterate through the DataFrame rows
+    for index, row in df.iterrows():
+        prediction = row['Predicted']
+        correct = row['Correct']
+        A_win_prob = row['A_win_prob']
+        A_draw_prob = row['A_draw_prob']
+        A_loss_prob = row['A_loss_prob']
+
+        # Find the column name based on the prediction
+        gt_column = f"GT_{prediction}"
+
+
+        if gt_column in row:
+            odds = row[gt_column]
+        else:
+            continue  # Skip if the column is not found
+        b = odds - 1
+        if prediction == '1':
+           f = ((b * A_win_prob) - (1-A_win_prob))/b
+           if A_win_prob < min_prob:
+               continue
+        if prediction == 'X':
+           if A_draw_prob < min_prob:
+               continue
+           f = ((b * A_draw_prob) - (1-A_draw_prob))/b
+        if prediction == '2':
+           if A_loss_prob < min_prob:
+               continue
+           f = ((b * A_loss_prob) - (1-A_loss_prob))/b
+        if prediction == '1X':
+            one_draw = A_win_prob + A_draw_prob
+            if one_draw < min_prob:
+                continue
+            f = ((b * one_draw) - (1 - one_draw)) / b
+        if prediction == 'X2':
+            two_draw = A_loss_prob + A_draw_prob
+            if two_draw < min_prob:
+                continue
+            f = ((b * two_draw) - (1 - two_draw)) / b
+        if prediction == '12':
+            one_two = A_win_prob + A_loss_prob
+            if one_two < min_prob:
+                continue
+
+            f = ((b * one_two) - (1 - one_two)) / b
+        f = int(f)
+        total_spent += amount*f
+
+        if correct:
+            gain += amount*f * odds
+        else:
+            loss += amount*f
+
+    # Print the results
+    print(f"Total gain: {gain}")
+    print(f"Total loss: {loss}")
+    print(f"Total spent: {total_spent}")
+    print(f"loss percentage: {loss/total_spent}")
+    print(f"gain percentage: {(gain -total_spent) / total_spent}")
 
 
 

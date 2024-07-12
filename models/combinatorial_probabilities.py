@@ -1,8 +1,7 @@
 import pandas as pd
 import os
 import json
-from lib.screapig_csv import features, filter_csv,get_first_encounters,get_second_encounters,process_results,csv_validate_models_exact,csv_validate_models_double, calculate_accuracy,calculate_gains_losses
-
+from lib.screapig_csv import features, filter_csv,get_first_encounters,get_second_encounters,process_results,csv_validate_models_exact,csv_validate_models_double, calculate_accuracy,calculate_gains_losses,kelly_calculate_gains_losses
 
 class TeamProbability:
     def __init__(self, team_stats, alpha=1.2, beta=0.8):
@@ -88,7 +87,7 @@ def combinatorial_process(df):
 def main():
     #variable
     file_name = "serie_a_npm=5.csv"
-    season = 0
+    season = 4
 
     #ONLY A SEASON
     feature_list = [features[2], features[3], features[4], features[5], features[6], features[7], features[8],
@@ -126,6 +125,12 @@ if __name__ == "__main__":
     print(f"combinatorial_probabilities_exact: {calculate_accuracy('combinatorial_probabilities_exact.csv')}")
     print(f"combinatorial_probabilities_double: {calculate_accuracy('combinatorial_probabilities_double.csv')}")
     print("Total gain with exact results")
-    calculate_gains_losses("combinatorial_probabilities_exact.csv", 2)
-    print("Total gain with double results")
-    calculate_gains_losses("combinatorial_probabilities_double.csv", 2)
+    value = 100
+    min_prob = 1
+    calculate_gains_losses("combinatorial_probabilities_exact.csv", value,min_prob)
+    print("\nTotal gain with double results")
+    calculate_gains_losses("combinatorial_probabilities_double.csv", value,min_prob)
+    print("\nTotal gain with exact results with kelly")
+    kelly_calculate_gains_losses("combinatorial_probabilities_exact.csv", value,min_prob)
+    print("\nTotal gain with double results with kelly")
+    kelly_calculate_gains_losses("combinatorial_probabilities_double.csv", value,min_prob)
