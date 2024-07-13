@@ -66,9 +66,9 @@ def filter_csv(file_name, feature_list, start_dir='.'):
             print(f"File trovato: {file_path}")
 
             dataframe = pd.read_csv(file_path)
-            filtered_dataframe = dataframe[feature_list]
+            #filtered_dataframe = dataframe[feature_list]
 
-            return filtered_dataframe
+            return dataframe
 
 def get_first_encounters(df):
     """
@@ -304,7 +304,7 @@ def calculate_accuracy(file_name):
 import pandas as pd
 
 
-def calculate_gains_losses(file_path, amount,min_prob):
+def calculate_gains_losses(file_path, amount,min_prob,min_gain):
     path = f'./predictions_file/{file_path}'
 
     df = pd.read_csv(path)
@@ -328,6 +328,8 @@ def calculate_gains_losses(file_path, amount,min_prob):
 
         if gt_column in row:
             odds = row[gt_column]
+            if odds < min_gain:
+                continue
         else:
             continue  # Skip if the column is not found
         if prediction == '1':
@@ -365,18 +367,21 @@ def calculate_gains_losses(file_path, amount,min_prob):
             gain += amount * odds
         else:
             loss += amount
-
+    if total_spent == 0:
+        return 0
     # Print the results
     print(f"Total gain: {gain}")
     print(f"Total loss: {loss}")
     print(f"Total spent: {total_spent}")
     print(f"loss percentage: {loss/total_spent}")
     print(f"gain percentage: {(gain- total_spent) / total_spent}")
+    return  (gain -total_spent) / total_spent
 
 
 
+import pandas as pd
 
-def kelly_calculate_gains_losses(file_path, amount,min_prob):
+def kelly_calculate_gains_losses(file_path, amount, min_prob, min_gain):
     path = f'./predictions_file/{file_path}'
 
     df = pd.read_csv(path)
@@ -397,54 +402,69 @@ def kelly_calculate_gains_losses(file_path, amount,min_prob):
         # Find the column name based on the prediction
         gt_column = f"GT_{prediction}"
 
-
         if gt_column in row:
             odds = row[gt_column]
+            if odds < min_gain:
+                continue
         else:
             continue  # Skip if the column is not found
+
         b = odds - 1
-        if prediction == '1':
-           f = ((b * A_win_prob) - (1-A_win_prob))/b
+
+        if str(prediction) == '1':
            if A_win_prob < min_prob:
                continue
-        if prediction == 'X':
+           f = ((b * A_win_prob) - (1 - A_win_prob)) / b
+        elif str(prediction) == 'X':
            if A_draw_prob < min_prob:
                continue
-           f = ((b * A_draw_prob) - (1-A_draw_prob))/b
-        if prediction == '2':
+           f = ((b * A_draw_prob) - (1 - A_draw_prob)) / b
+        elif str(prediction) == '2':
            if A_loss_prob < min_prob:
                continue
-           f = ((b * A_loss_prob) - (1-A_loss_prob))/b
-        if prediction == '1X':
+           f = ((b * A_loss_prob) - (1 - A_loss_prob)) / b
+        elif prediction == '1X':
             one_draw = A_win_prob + A_draw_prob
             if one_draw < min_prob:
                 continue
             f = ((b * one_draw) - (1 - one_draw)) / b
-        if prediction == 'X2':
+        elif prediction == '2X':
             two_draw = A_loss_prob + A_draw_prob
             if two_draw < min_prob:
                 continue
             f = ((b * two_draw) - (1 - two_draw)) / b
-        if prediction == '12':
+        elif prediction == '12':
             one_two = A_win_prob + A_loss_prob
             if one_two < min_prob:
                 continue
-
             f = ((b * one_two) - (1 - one_two)) / b
-        f = int(f)
-        total_spent += amount*f
+        else:
+            continue  # Skip if the prediction is not recognized
+
+        amount_int = int(amount * f)
+
+        # Ensure the amount_int is non-negative
+        if amount_int < 0:
+            continue
+
+        total_spent += amount_int
 
         if correct:
-            gain += amount*f * odds
+            gain += amount_int * odds
         else:
-            loss += amount*f
+            loss += amount_int
+
+    if total_spent == 0:
+        return 0
 
     # Print the results
     print(f"Total gain: {gain}")
     print(f"Total loss: {loss}")
     print(f"Total spent: {total_spent}")
-    print(f"loss percentage: {loss/total_spent}")
-    print(f"gain percentage: {(gain -total_spent) / total_spent}")
+    print(f"loss percentage: {loss / total_spent}")
+    print(f"gain percentage: {(gain - total_spent) / total_spent}")
+    return (gain - total_spent) / total_spent
+
 
 
 
