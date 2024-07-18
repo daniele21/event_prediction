@@ -37,7 +37,6 @@ class DatabaseManager:
         if league_path is not None and exists(league_path):
             league_df = pd.read_csv(league_path, index_col=0)
             league_df = update_league_data(league_df, n_prev_match) if update else league_df
-            league_df = shift_data_features(league_df)
             logger.info('> Updating league data')
             league_df.to_csv(league_path)
 
@@ -79,6 +78,7 @@ def update_league_data(league_df, n_prev_match):
             update_df = feature_engineering_league(update_df, n_prev_match)
             update_df = update_df[update_df['Date'] > last_date]
             league_df = league_df.append(update_df).reset_index(drop=True)
+            league_df = shift_data_features(league_df)
 
         # ----------------------------------
 

@@ -1,5 +1,5 @@
 
-from core.dataset_manager.db_manager import DatabaseManager
+from core.dataset.db_manager import DatabaseManager
 from core.logger import logger
 
 
