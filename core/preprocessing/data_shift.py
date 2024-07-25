@@ -29,7 +29,7 @@ def shift_data_features(data):
     final_data['goals_diff'] = final_data['prev_home_league_goals'] - final_data['prev_away_league_goals']
     final_data['point_diff'] = final_data['prev_home_league_points'] - final_data['prev_away_league_points']
 
-    final_data = final_data[['league', 'season', 'match_n', 'Date', 'HomeTeam', 'AwayTeam',
+    final_data = final_data[['league', 'season', 'match_n', 'match_day','Date', 'HomeTeam', 'AwayTeam',
                              'home_goals', 'away_goals', 'result_1X2', 'home_points', 'away_points',
                              'bet_1', 'bet_X', 'bet_2', 'point_diff', 'goals_diff',
                              'prev_cum_home_points',
