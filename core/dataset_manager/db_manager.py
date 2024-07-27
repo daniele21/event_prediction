@@ -4,6 +4,9 @@ import pandas as pd
 
 from pathlib import Path
 import os
+
+from tqdm import tqdm
+
 import config.league as LEAGUE
 
 from config.data_path import get_league_csv_paths
@@ -12,6 +15,7 @@ from core.logger import logger
 from core.preprocessing.data_shift import shift_data_features
 from core.preprocessing.league_preprocessing import feature_engineering_league
 from core.time_decorator import timing
+from core.utils import get_most_recent_data, ensure_folder, get_timestamp
 
 
 class DatabaseManager:
@@ -23,36 +27,36 @@ class DatabaseManager:
     def extract_data_league(self):
         league_name = self.params['league_name']
         n_prev_match = int(self.params['n_prev_match'])
-        league_dir = self.params['league_dir']
+        league_dir = self.params['league_dir'] + league_name + '/'
         update = self.params['update']
 
         logger.info(f'> Extracting {league_name}')
 
         # LOADING TRAINING DATA --> ALL DATA SEASON
-        league_path = f'{league_dir}{league_name}/{league_name}_npm={n_prev_match}.csv' \
-            if league_dir is not None else None
+        league_path = get_most_recent_data(league_dir, league_name, n_prev_match)
 
         # LEAGUE CSV ALREADY EXISTING
         print(league_path)
         if league_path is not None and exists(league_path):
             league_df = pd.read_csv(league_path, index_col=0)
-            league_df = update_league_data(league_df, n_prev_match) if update else league_df
-            league_df = shift_data_features(league_df)
-            logger.info('> Updating league data')
-            league_df.to_csv(league_path)
+            league_df, update = update_league_data(league_df, n_prev_match) if update else league_df
+            if update:
+                league_df = shift_data_features(league_df)
+                logger.info('> Updating league data')
+                ensure_folder(league_dir)
+                league_path = f'{league_dir}{league_name}_npm={n_prev_match}_{get_timestamp()}.csv'
+                league_df.to_csv(league_path)
+            else:
+                logger.info('> No new data to update')
+                return pd.read_csv(league_path, index_col=0)
 
         # GENERATING LEAGUE CSV
         else:
             league_df = extract_data(league_name, n_prev_match)
             league_df = shift_data_features(league_df)
 
-            parent = Path(league_path).parent
-            if not parent.is_dir():
-                os.makedirs(parent, exist_ok=True)
-                print(f"Created directory: '{parent}'")
-            else:
-                print(f"Directory already exists: '{parent}'")
-            print(f"Absolute path: {Path(league_path).resolve()}")
+            ensure_folder(league_dir)
+            league_path = f'{league_dir}{league_name}_npm={n_prev_match}_{get_timestamp()}.csv'
             logger.info(f'Saving data at {league_path}')
             league_df.to_csv(league_path)
 
@@ -65,7 +69,9 @@ def update_league_data(league_df, n_prev_match):
 
     assert league_name in LEAGUE.LEAGUE_NAMES, f'Update League Data: Wrong League Name >> {league_name} provided'
 
-    for season_i, path in enumerate(get_league_csv_paths(league_name)):
+    update = False
+    for season_i, path in tqdm(enumerate(get_league_csv_paths(league_name)),
+                               desc=' > Extracting Season Data: '):
         season_df = extract_season_data(path, season_i, league_name)
 
         # ---------CHECK LAST DATE----------
@@ -79,9 +85,10 @@ def update_league_data(league_df, n_prev_match):
             update_df = feature_engineering_league(update_df, n_prev_match)
             update_df = update_df[update_df['Date'] > last_date]
             league_df = league_df.append(update_df).reset_index(drop=True)
+            update = True
 
         # ----------------------------------
 
     league_df['Date'] = pd.to_datetime(league_df['Date'])
 
-    return league_df
+    return league_df, update

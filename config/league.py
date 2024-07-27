@@ -9,57 +9,8 @@ SERIE_A_PATH = ['https://www.football-data.co.uk/mmz4281/1819/I1.csv',
                 'https://www.football-data.co.uk/mmz4281/2021/I1.csv',
                 'https://www.football-data.co.uk/mmz4281/2122/I1.csv',
                 'https://www.football-data.co.uk/mmz4281/2223/I1.csv',
-                'https://www.football-data.co.uk/mmz4281/2324/I1.csv']
-
-PARMA = 'Parma'
-FIORENTINA = 'Fiorentina'
-UDINESE = 'Udinese'
-CAGLIARI = 'Cagliari'
-ROMA = 'Roma'
-SAMPDORIA = 'Sampdoria'
-SPAL = 'Spal'
-TORINO = 'Torino'
-VERONA = 'Verona'
-INTER = 'Inter'
-BOLOGNA = 'Bologna'
-MILAN = 'Milan'
-JUVENTUS = 'Juventus'
-LAZIO = 'Lazio'
-ATALANTA = 'Atalanta'
-GENOA = 'Genoa'
-LECCE = 'Lecce'
-SASSUOLO = 'Sassuolo'
-NAPOLI = 'Napoli'
-BRESCIA = 'Brescia'
-SPEZIA = 'Spezia'
-BENEVENTO = 'Benevento'
-CROTONE = 'Crotone'
-
-SERIE_A_TEAMS = [PARMA, FIORENTINA, UDINESE, CAGLIARI, ROMA, SAMPDORIA,
-                 TORINO, VERONA, INTER, BOLOGNA, MILAN, JUVENTUS,
-                 LAZIO, ATALANTA, GENOA, SASSUOLO, NAPOLI,
-                 SPEZIA, BENEVENTO, CROTONE]
-
-SERIE_A_DECODER = {'AC Milan': MILAN,
-                   'ACF Fiorentina': FIORENTINA,
-                   'AS Roma': ROMA,
-                   'Atalanta BC': ATALANTA,
-                   'Benevento Calcio': BENEVENTO,
-                   'Bologna FC 1909': BOLOGNA,
-                   'Cagliari Calcio': CAGLIARI,
-                   'FC Crotone': CROTONE,
-                   'FC Internazionale Milano': INTER,
-                   'Genoa CFC': GENOA,
-                   'Hellas Verona FC': VERONA,
-                   'Juventus FC': JUVENTUS,
-                   'Parma Calcio 1913': PARMA,
-                   'SS Lazio': LAZIO,
-                   'SSC Napoli': NAPOLI,
-                   'Spezia Calcio': SPEZIA,
-                   'Torino FC': TORINO,
-                   'UC Sampdoria': SAMPDORIA,
-                   'US Sassuolo Calcio': SASSUOLO,
-                   'Udinese Calcio': UDINESE}
+                'https://www.football-data.co.uk/mmz4281/2324/I1.csv'
+                ]
 
 #%% PREMIER
 PREMIER = 'premier_league'
@@ -75,54 +26,10 @@ PREMIER_PATH = ['https://www.football-data.co.uk/mmz4281/1011/E0.csv',
                 'https://www.football-data.co.uk/mmz4281/1718/E0.csv',
                 'https://www.football-data.co.uk/mmz4281/1819/E0.csv',
                 'https://www.football-data.co.uk/mmz4281/1920/E0.csv',
-                'https://www.football-data.co.uk/mmz4281/2021/E0.csv']
-
-LIVERPOOL = 'Liverpool'
-WEST_HAM = 'West Ham'
-BURNLEY = 'Burnley'
-CRYSTAL_PALACE = 'Crystal Palace'
-TOTTENHAM = 'Tottenham'
-LEICESTER = 'Leicester'
-NEWCASTLE = 'Newcastle'
-MAN_UNITED = 'Man United'
-ARSENAL = 'Arsenal'
-ASTON_VILLA = 'Aston Villa'
-BRIGHTON = 'Brighton'
-EVERTON = 'Everton'
-SOUTHAMPTON = 'Southampton'
-MAN_CITY = 'Man City'
-SHEFFIELD_UNITED = 'Sheffield United'
-CHELSEA = 'Chelsea'
-WOLVES = 'Wolves'
-WEST_BROM = 'West Brom'
-FULHAM = 'Fulham'
-LEEDS = 'Leeds'
-
-PREMIER_TEAMS = [LIVERPOOL, WEST_HAM, BURNLEY, CRYSTAL_PALACE, LEEDS, WEST_BROM,
-                 TOTTENHAM, LEICESTER, NEWCASTLE, MAN_UNITED,
-                 ARSENAL, ASTON_VILLA, BRIGHTON, EVERTON, SOUTHAMPTON,
-                 MAN_CITY, SHEFFIELD_UNITED, CHELSEA, WOLVES, FULHAM]
-
-PREMIER_DECODER = {'Arsenal FC': ARSENAL,
-                   'Aston Villa FC': ASTON_VILLA,
-                   'Brighton & Hove Albion FC': BRIGHTON,
-                   'Burnley FC': BURNLEY,
-                   'Chelsea FC': CHELSEA,
-                   'Crystal Palace FC': CRYSTAL_PALACE,
-                   'Everton FC': EVERTON,
-                   'Fulham FC': FULHAM,
-                   'Leeds United FC': LEEDS,
-                   'Leicester City FC': LEICESTER,
-                   'Liverpool FC': LIVERPOOL,
-                   'Manchester City FC': MAN_CITY,
-                   'Manchester United FC': MAN_UNITED,
-                   'Newcastle United FC': NEWCASTLE,
-                   'Sheffield United FC': SHEFFIELD_UNITED,
-                   'Southampton FC': SOUTHAMPTON,
-                   'Tottenham Hotspur FC': TOTTENHAM,
-                   'West Bromwich Albion FC': WEST_BROM,
-                   'West Ham United FC': WEST_HAM,
-                   'Wolverhampton Wanderers FC': WOLVES}
+                'https://www.football-data.co.uk/mmz4281/2021/E0.csv',
+                'https://www.football-data.co.uk/mmz4281/2122/E0.csv',
+                'https://www.football-data.co.uk/mmz4281/2223/E0.csv',
+                'https://www.football-data.co.uk/mmz4281/2324/E0.csv']
 
 #%%
 PREMIER_2 = 'premier_2'
@@ -137,7 +44,10 @@ PREMIER_2_PATH = ['https://www.football-data.co.uk/mmz4281/1011/E1.csv',
                   'https://www.football-data.co.uk/mmz4281/1617/E1.csv',
                   'https://www.football-data.co.uk/mmz4281/1819/E1.csv',
                   'https://www.football-data.co.uk/mmz4281/1920/E1.csv',
-                  'https://www.football-data.co.uk/mmz4281/2021/E1.csv']
+                  'https://www.football-data.co.uk/mmz4281/2021/E1.csv',
+                  'https://www.football-data.co.uk/mmz4281/2122/E1.csv'
+                  'https://www.football-data.co.uk/mmz4281/2223/E1.csv'
+                  'https://www.football-data.co.uk/mmz4281/2324/E1.csv']
 
 LUTON = 'Luton'
 BOURNEMOUTH = 'Bournemouth'
@@ -648,61 +558,61 @@ LEAGUE_PATHS = {SERIE_A: SERIE_A_PATH,
                 BUNDESLIGA: BUNDESLIGA_PATH,
                 BUNDESLIGA_2: BUNDESLIGA_2_PATH}
 
-TEAMS_LEAGUE = {SERIE_A: SERIE_A_TEAMS,
-                PREMIER: PREMIER_TEAMS,
-                PREMIER_2: PREMIER_2_TEAMS,
-                JUPILIER: JUPILIER_TEAMS,
-                LIGUE_1: LIGUE_1_TEAMS,
-                LIGUE_2: LIGUE_2_TEAMS,
-                EREDIVISIE: EREDIVISIE_TEAMS,
-                LIGA: LIGA_TEAMS,
-                LIGA_2: LIGA_2_TEAMS,
-                BUNDESLIGA: BUNDESLIGA_TEAMS,
-                BUNDESLIGA_2: BUNDESLIGA_2_TEAMS
-                }
-
-N_TEAMS = {SERIE_A: 20,
-           PREMIER: 20,
-           PREMIER_2: 24,
-           JUPILIER: 18,
-           LIGUE_1: 20,
-           LIGUE_2: 20,
-           EREDIVISIE: 18,
-           LIGA: 20,
-           LIGA_2: 22,
-           BUNDESLIGA: 18,
-           BUNDESLIGA_2: 18}
-
-LEAGUE_ENCODER = {'league2id': {PREMIER: PREMIER_ID,
-                                PREMIER_2: PREMIER_2_ID,
-                                SERIE_A: SERIE_A_ID,
-                                BUNDESLIGA: BUNDESLIGA_ID,
-                                BUNDESLIGA_2: BUNDESLIGA_2_ID,
-                                JUPILIER: JUPILIER_ID,
-                                EREDIVISIE: EREDIVISIE_ID,
-                                LIGUE_1: LIGUE_1_ID,
-                                LIGUE_2: LIGUE_2_ID,
-                                LIGA: LIGA_ID,
-                                LIGA_2: LIGA_2_ID},
-                  }
-
-LEAGUE_DECODER = {'id2league': {PREMIER_ID: PREMIER,
-                                PREMIER_2_ID: PREMIER_2,
-                                SERIE_A_ID: SERIE_A,
-                                BUNDESLIGA_ID: BUNDESLIGA,
-                                BUNDESLIGA_2_ID: BUNDESLIGA_2,
-                                JUPILIER_ID: JUPILIER,
-                                EREDIVISIE_ID: EREDIVISIE,
-                                LIGUE_1_ID: LIGUE_1,
-                                LIGUE_2_ID: LIGUE_2,
-                                LIGA_ID: LIGA,
-                                LIGA_2_ID: LIGA_2
-                                },
-                  'league2league': {PREMIER: PREMIER_DECODER,
-                                    SERIE_A: SERIE_A_DECODER,
-                                    PREMIER_2: PREMIER_2_DECODER,
-                                    LIGUE_1: LIGUE_1_DECODER,
-                                    EREDIVISIE: EREDIVISIE_DECODER,
-                                    BUNDESLIGA: BUNDESLIGA_DECODER,
-                                    LIGA: LIGA_DECODER}
-                  }
+# TEAMS_LEAGUE = {SERIE_A: SERIE_A_TEAMS,
+#                 PREMIER: PREMIER_TEAMS,
+#                 PREMIER_2: PREMIER_2_TEAMS,
+#                 JUPILIER: JUPILIER_TEAMS,
+#                 LIGUE_1: LIGUE_1_TEAMS,
+#                 LIGUE_2: LIGUE_2_TEAMS,
+#                 EREDIVISIE: EREDIVISIE_TEAMS,
+#                 LIGA: LIGA_TEAMS,
+#                 LIGA_2: LIGA_2_TEAMS,
+#                 BUNDESLIGA: BUNDESLIGA_TEAMS,
+#                 BUNDESLIGA_2: BUNDESLIGA_2_TEAMS
+#                 }
+#
+# N_TEAMS = {SERIE_A: 20,
+#            PREMIER: 20,
+#            PREMIER_2: 24,
+#            JUPILIER: 18,
+#            LIGUE_1: 20,
+#            LIGUE_2: 20,
+#            EREDIVISIE: 18,
+#            LIGA: 20,
+#            LIGA_2: 22,
+#            BUNDESLIGA: 18,
+#            BUNDESLIGA_2: 18}
+#
+# LEAGUE_ENCODER = {'league2id': {PREMIER: PREMIER_ID,
+#                                 PREMIER_2: PREMIER_2_ID,
+#                                 SERIE_A: SERIE_A_ID,
+#                                 BUNDESLIGA: BUNDESLIGA_ID,
+#                                 BUNDESLIGA_2: BUNDESLIGA_2_ID,
+#                                 JUPILIER: JUPILIER_ID,
+#                                 EREDIVISIE: EREDIVISIE_ID,
+#                                 LIGUE_1: LIGUE_1_ID,
+#                                 LIGUE_2: LIGUE_2_ID,
+#                                 LIGA: LIGA_ID,
+#                                 LIGA_2: LIGA_2_ID},
+#                   }
+#
+# LEAGUE_DECODER = {'id2league': {PREMIER_ID: PREMIER,
+#                                 PREMIER_2_ID: PREMIER_2,
+#                                 SERIE_A_ID: SERIE_A,
+#                                 BUNDESLIGA_ID: BUNDESLIGA,
+#                                 BUNDESLIGA_2_ID: BUNDESLIGA_2,
+#                                 JUPILIER_ID: JUPILIER,
+#                                 EREDIVISIE_ID: EREDIVISIE,
+#                                 LIGUE_1_ID: LIGUE_1,
+#                                 LIGUE_2_ID: LIGUE_2,
+#                                 LIGA_ID: LIGA,
+#                                 LIGA_2_ID: LIGA_2
+#                                 },
+#                   'league2league': {PREMIER: PREMIER_DECODER,
+#                                     SERIE_A: SERIE_A_DECODER,
+#                                     PREMIER_2: PREMIER_2_DECODER,
+#                                     LIGUE_1: LIGUE_1_DECODER,
+#                                     EREDIVISIE: EREDIVISIE_DECODER,
+#                                     BUNDESLIGA: BUNDESLIGA_DECODER,
+#                                     LIGA: LIGA_DECODER}
+#                   }

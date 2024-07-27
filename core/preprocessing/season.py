@@ -26,13 +26,17 @@ def calculate_team_based_match_day(df):
 
     return df
 
+
 def preprocessing_season(season_df, n_season, league_name):
     data = season_df.copy(deep=True)
 
     data.insert(0, 'season', n_season)
     data.insert(0, 'league', league_name)
     data.insert(2, 'match_n', np.arange(1, len(data) + 1, 1))
-    data['Date'] = pd.to_datetime(data['Date'], dayfirst=True)
+    try:
+        data['Date'] = pd.to_datetime(data['Date'], format='%d/%m/%y')
+    except ValueError as exc:
+        data['Date'] = pd.to_datetime(data['Date'], format='%d/%m/%Y')
     data = calculate_team_based_match_day(data)
 
     return data
