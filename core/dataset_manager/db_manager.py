@@ -36,7 +36,7 @@ class DatabaseManager:
         league_path = get_most_recent_data(league_dir, league_name, n_prev_match)
 
         # LEAGUE CSV ALREADY EXISTING
-        print(league_path)
+        logger.info(f'League path found: {league_path}')
         if league_path is not None and exists(league_path):
             league_df = pd.read_csv(league_path, index_col=0)
             league_df, update = update_league_data(league_df, n_prev_match) if update else league_df

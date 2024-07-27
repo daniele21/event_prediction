@@ -4,6 +4,8 @@ from urllib.error import HTTPError
 import certifi
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
+
 import config.league as LEAGUE
 import io
 import os
@@ -43,7 +45,8 @@ def extract_season_data(path, season_i, league_name):
 def extract_data(league_name, n_prev_match):
     league_df = pd.DataFrame()
 
-    for season_i, path in enumerate(LEAGUE.LEAGUE_PATHS[league_name]):
+    for season_i, path in tqdm(enumerate(LEAGUE.LEAGUE_PATHS[league_name]),
+                               desc=' > Extracting Season Data: '):
         season_df = extract_season_data(path, season_i, league_name)
         league_df = pd.concat((league_df, season_df), axis=0)
         league_df = league_df.reset_index(drop=True)

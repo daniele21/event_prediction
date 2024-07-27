@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.metrics import recall_score, precision_score, f1_score
+from tqdm import tqdm
 
 
 def training_process(datasets, estimator, params):
@@ -7,7 +8,8 @@ def training_process(datasets, estimator, params):
     model_probabilities = pd.DataFrame()
     model = estimator(**params)
 
-    for i, dataset in datasets.items():
+    for i, dataset in tqdm(datasets.items(),
+                           desc=' > Training Steps: '):
         x_train, x_test, x_target = dataset['train']['x'], dataset['test']['x'], dataset['target']['x']
         y_train, y_test, y_target = dataset['train']['y'], dataset['test']['y'], dataset['target']['y']
 

@@ -1,8 +1,9 @@
 from itertools import product
 
 import pandas as pd
-from sklearn.metrics import recall_score, classification_report, precision_score, f1_score
+from sklearn.metrics import recall_score, precision_score, f1_score
 import numpy as np
+from tqdm import tqdm
 
 
 def grid_search(estimator, datasets, param_grid, scoring='recall'):
@@ -12,7 +13,7 @@ def grid_search(estimator, datasets, param_grid, scoring='recall'):
 
     final_scores = pd.DataFrame()
 
-    for params in param_combinations:
+    for params in tqdm(param_combinations, total=len(param_combinations), desc=' > Tuning Hyperparameters: '):
         params_scores = pd.DataFrame()
         model = estimator(**params)
 
