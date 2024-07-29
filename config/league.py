@@ -4,13 +4,22 @@
 SERIE_A = 'serie_a'
 SERIE_A_ID = 2019
 
-SERIE_A_PATH = ['https://www.football-data.co.uk/mmz4281/1819/I1.csv',
-                'https://www.football-data.co.uk/mmz4281/1920/I1.csv',
-                'https://www.football-data.co.uk/mmz4281/2021/I1.csv',
-                'https://www.football-data.co.uk/mmz4281/2122/I1.csv',
-                'https://www.football-data.co.uk/mmz4281/2223/I1.csv',
-                'https://www.football-data.co.uk/mmz4281/2324/I1.csv'
-                ]
+SERIE_A_PATH = [
+    'https://www.football-data.co.uk/mmz4281/1011/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/1112/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/1213/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/1314/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/1415/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/1516/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/1617/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/1718/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/1819/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/1920/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/2021/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/2122/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/2223/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/2324/I1.csv'
+]
 
 #%% PREMIER
 PREMIER = 'premier_league'
@@ -45,71 +54,9 @@ PREMIER_2_PATH = ['https://www.football-data.co.uk/mmz4281/1011/E1.csv',
                   'https://www.football-data.co.uk/mmz4281/1819/E1.csv',
                   'https://www.football-data.co.uk/mmz4281/1920/E1.csv',
                   'https://www.football-data.co.uk/mmz4281/2021/E1.csv',
-                  'https://www.football-data.co.uk/mmz4281/2122/E1.csv'
-                  'https://www.football-data.co.uk/mmz4281/2223/E1.csv'
+                  'https://www.football-data.co.uk/mmz4281/2122/E1.csv',
+                  'https://www.football-data.co.uk/mmz4281/2223/E1.csv',
                   'https://www.football-data.co.uk/mmz4281/2324/E1.csv']
-
-LUTON = 'Luton'
-BOURNEMOUTH = 'Bournemouth'
-BARNSLEY = 'Barnsley'
-BLACKBURN = 'Blackburn'
-BRENTFORD = 'Brentford'
-COVENTRY = 'Coventry'
-MILLWALL = 'Millwall'
-READING = 'Reading'
-STOKE = 'Stoke'
-SWANSEA = 'Swansea'
-WIGAN = 'Wigan'
-NOTTINGAM_FOREST = 'Nott\'m Forest'
-BRISTOL_CITY = 'Bristol City'
-HUDDERSFIELD = 'Huddersfield'
-LEEDS = 'Leeds'
-BIRMINGHAM = 'Birmingham'
-CARDIFF = 'Cardiff'
-CHARLTON = 'Charlton'
-DERBY = 'Derby'
-FULHAM = 'Fulham'
-HULL = 'Hull'
-NORWICH = 'Norwich'
-MIDDLESBROUGH = 'Middlesbrough'
-PRESTON = 'Preston'
-QPR = 'QPR'
-SHEFFIELD_WEDS = 'Sheffield Weds'
-WEST_BROM = 'West Brom'
-WATFORD = 'Watford'
-WYCOMBE = 'Wycombe'
-ROTHERHAM = 'Rotherham'
-
-PREMIER_2_TEAMS = [LUTON, BARNSLEY, BLACKBURN, BRENTFORD, MILLWALL,
-                   READING, STOKE, SWANSEA, WIGAN, NOTTINGAM_FOREST,
-                   BRISTOL_CITY, HUDDERSFIELD, LEEDS, BIRMINGHAM, CARDIFF,
-                   CHARLTON, DERBY, FULHAM, HULL, MIDDLESBROUGH,
-                   PRESTON, QPR, SHEFFIELD_WEDS, WEST_BROM]
-
-PREMIER_2_DECODER = {'AFC Bournemouth': BOURNEMOUTH,
-                     'Barnsley FC': BARNSLEY,
-                     'Birmingham City FC': BIRMINGHAM,
-                     'Blackburn Rovers FC': BLACKBURN,
-                     'Brentford FC': BRENTFORD,
-                     'Bristol City FC': BRISTOL_CITY,
-                     'Cardiff City FC': CARDIFF,
-                     'Coventry City FC': COVENTRY,
-                     'Derby County FC': DERBY,
-                     'Huddersfield Town AFC': HUDDERSFIELD,
-                     'Luton Town FC': LUTON,
-                     'Middlesbrough FC': MIDDLESBROUGH,
-                     'Millwall FC': MILLWALL,
-                     'Norwich City FC': NORWICH,
-                     'Nottingham Forest FC': NOTTINGAM_FOREST,
-                     'Preston North End FC': PRESTON,
-                     'Queens Park Rangers FC': QPR,
-                     'Reading FC': READING,
-                     'Rotherham United FC': ROTHERHAM,
-                     'Sheffield Wednesday FC': SHEFFIELD_WEDS,
-                     'Stoke City FC': STOKE,
-                     'Swansea City AFC': SWANSEA,
-                     'Watford FC': WATFORD,
-                     'Wycombe Wanderers FC': WYCOMBE}
 
 #%%
 
@@ -126,30 +73,10 @@ JUPILIER_PATH = ['https://www.football-data.co.uk/mmz4281/1011/B1.csv',
                  'https://www.football-data.co.uk/mmz4281/1718/B1.csv',
                  'https://www.football-data.co.uk/mmz4281/1819/B1.csv',
                  'https://www.football-data.co.uk/mmz4281/1920/B1.csv',
-                 'https://www.football-data.co.uk/mmz4281/2021/B1.csv']
-
-GENK = 'Genk'
-CERCLE_BRUGGE = 'Cercle Brugge'
-ST_TRUIDEN = 'St Truiden'
-WAREGEM = 'Waregem'
-WAASLAND_BEVEREN = 'Waasland-Beveren'
-ANDERLECHT = 'Anderlecht'
-CHARLEROI = 'Charleroi'
-EUPEN = 'Eupen'
-CLUB_BRUGGE = 'Club Brugge'
-ST_LIEGI = 'St Liegi'
-KORTRIJK = 'Kortrijk'
-OOSTENDE = 'Oostende'
-MECHELEN = 'Mechelen'
-GENT = 'Gent'
-MOUSCRON = 'Mouscron'
-ANTWERP = 'Antwerp'
-BEERSCHOT = 'Beerschot'
-LEUVEN = 'Leuven'
-
-JUPILIER_TEAMS = [BEERSCHOT, GENK, LEUVEN, CERCLE_BRUGGE, ST_TRUIDEN, WAREGEM, WAASLAND_BEVEREN,
-                  ANDERLECHT, CHARLEROI, EUPEN, CLUB_BRUGGE, ST_LIEGI,
-                  KORTRIJK, OOSTENDE, MECHELEN, GENT, MOUSCRON, ANTWERP]
+                 'https://www.football-data.co.uk/mmz4281/2021/B1.csv',
+                 'https://www.football-data.co.uk/mmz4281/2122/B1.csv',
+                 'https://www.football-data.co.uk/mmz4281/2223/B1.csv',
+                 'https://www.football-data.co.uk/mmz4281/2324/B1.csv', ]
 
 # LIGUE 1
 

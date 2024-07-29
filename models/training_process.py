@@ -3,7 +3,7 @@ from sklearn.metrics import recall_score, precision_score, f1_score
 from tqdm import tqdm
 
 
-def training_process(datasets, estimator, params):
+def training_process(datasets, estimator, params, inference=False):
     model_scores = pd.DataFrame()
     model_probabilities = pd.DataFrame()
     model = estimator(**params)
@@ -13,15 +13,16 @@ def training_process(datasets, estimator, params):
         x_train, x_test, x_target = dataset['train']['x'], dataset['test']['x'], dataset['target']['x']
         y_train, y_test, y_target = dataset['train']['y'], dataset['test']['y'], dataset['target']['y']
 
-        x_train = pd.concat((x_train, x_test), axis=0)
-        y_train = pd.concat((y_train, y_test), axis=0)
+        if inference:
+            x_train = pd.concat((x_train, x_test), axis=0)
+            y_train = pd.concat((y_train, y_test), axis=0)
 
         # Create and train the model
         model.fit(x_train, y_train.squeeze())
 
         # Evaluate the model
-        predictions = model.predict(x_target)
-        probabilities = model.predict_proba(x_target)
+        predictions = model.predict(x_target) if inference else model.predict(x_test)
+        probabilities = model.predict_proba(x_target) if inference else model.predict_proba(x_test)
         recall = recall_score(y_target, predictions, average='weighted')
         precision = precision_score(y_target, predictions, average='weighted')
         f1 = f1_score(y_target, predictions, average='weighted')
@@ -40,6 +41,6 @@ def training_process(datasets, estimator, params):
 
     model_scores = model_scores.reset_index()\
                                 .rename(columns={'index': 'target_day'})
-    model_probabilities = model_probabilities.rename(columns={0: 'X', 1:'1', 2:'2'})
+    model_probabilities = model_probabilities.rename(columns={0: 'X', 1: '1', 2: '2'})
 
     return model, model_scores, model_probabilities
