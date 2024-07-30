@@ -1,4 +1,6 @@
 import os
+import numpy as np
+
 import pandas as pd
 
 features = [
@@ -466,5 +468,28 @@ def kelly_calculate_gains_losses(file_path, amount, min_prob, min_gain):
     return (gain - total_spent) / total_spent
 
 
+def best_model(value, exact,double):
+    best_min_prob = None
+    best_min_gain = None
+    max_gain = float('-inf')
+
+    for min_prob in np.arange(0.5, 1.0, 0.05):
+        for min_gain in np.arange(1, 10, 1):
+            gain_exact = calculate_gains_losses(exact, value, min_prob, min_gain)
+            gain_double = calculate_gains_losses(double, value, min_prob, min_gain)
+            gain_kelly_exact = kelly_calculate_gains_losses(exact, value, min_prob, min_gain)
+            gain_kelly_double = kelly_calculate_gains_losses(double, value, min_prob, min_gain)
+
+            total_gain = gain_exact + gain_double + gain_kelly_exact + gain_kelly_double
+
+            if total_gain > max_gain:
+                max_gain = total_gain
+                best_min_prob = min_prob
+                best_min_gain = min_gain
+
+    print(f"Best min_prob: {best_min_prob}")
+    print(f"Best min_gain: {best_min_gain}")
+    print(f"Max gain: {max_gain}")
+    return best_min_prob, best_min_gain
 
 
