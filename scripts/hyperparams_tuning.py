@@ -31,7 +31,7 @@ if __name__ == '__main__':
     dataset_params = {'drop_last': 5,
                       'drop_first': 5,
                       'last_n_seasons': 13,
-                      'target_match_days': np.arange(7, 31),
+                      'target_match_days': np.arange(9,31),
                       'test_match_day': 2,
                       'preprocessing_version': MATCH_RESULT_V1,
                       }
