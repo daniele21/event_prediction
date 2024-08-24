@@ -19,8 +19,8 @@ def encode_match_result(result_1x2):
 def match_result_v1(data):
     target = 'result_1X2'
     drop_cols = ['home_goals',
-                  'away_goals', 'home_points',
-                  'away_points', 'league',
+                  'away_goals',
+                    'league',
                   'AwayTeam', 'HomeTeam',
                   'Date', 'match_n', 'bet_1',
                   'bet_X', 'bet_2']

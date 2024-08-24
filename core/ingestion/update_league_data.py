@@ -4,8 +4,6 @@ from core.logger import logger
 
 
 def update_data_league(params):
-    league_name = params['league_name']
-    npm = params['n_prev_match']
 
     league_csv = extract_data_league(params)
     last_date = league_csv.iloc[-1]['Date']
