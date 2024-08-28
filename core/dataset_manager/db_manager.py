@@ -2,7 +2,6 @@ from os.path import exists
 
 import pandas as pd
 
-
 from tqdm import tqdm
 
 import config.league as LEAGUE
@@ -14,7 +13,7 @@ from core.preprocessing.data_shift import shift_data_features
 from core.preprocessing.league_preprocessing import feature_engineering_league
 from core.preprocessing.preprocessing import calculate_h2h_stats
 from core.time_decorator import timing
-from core.utils import get_most_recent_data, ensure_folder, get_timestamp
+from core.utils import get_most_recent_data_path, ensure_folder, get_timestamp
 
 
 class DatabaseManager:
@@ -27,12 +26,12 @@ class DatabaseManager:
         league_name = self.params['league_name']
         windows = list(self.params['windows'])
         league_dir = self.params['league_dir'] + league_name + '/'
-        update = self.params['update']
+        update = self.params['update'] if 'update' in self.params else True
 
         logger.info(f'> Extracting {league_name}')
 
         # LOADING TRAINING DATA --> ALL DATA SEASON
-        league_path = get_most_recent_data(league_dir, league_name, windows)
+        league_path = get_most_recent_data_path(league_dir, league_name, windows)
 
         # LEAGUE CSV ALREADY EXISTING
         logger.info(f'League path found: {league_path}')
@@ -81,7 +80,7 @@ def update_league_data(league_df, windows):
     update = False
     league_paths = get_league_csv_paths(league_name)
     league_path_list = [x for x in league_paths if str(last_season) in x]
-    league_path = league_path_list[0] if len(league_path_list)>0 else None
+    league_path = league_path_list[0] if len(league_path_list) > 0 else None
 
     season_df = extract_season_data(league_path, last_season, league_name)
 

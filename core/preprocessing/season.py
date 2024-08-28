@@ -30,7 +30,8 @@ def calculate_team_based_match_day(df):
 
 def compute_team_stats(df, team_name, match_date, window):
     # Filter matches where the team was either home or away
-    relevant_matches = df[((df['HomeTeam'] == team_name) | (df['AwayTeam'] == team_name)) & (df['Date'] < match_date)].copy()
+    relevant_matches = df[
+        ((df['HomeTeam'] == team_name) | (df['AwayTeam'] == team_name)) & (df['Date'] < match_date)].copy()
 
     # Assign points based on whether the team was home or away
     relevant_matches['Points'] = np.where(
@@ -58,27 +59,43 @@ def compute_team_stats(df, team_name, match_date, window):
 
     # Calculate rolling mean and handle empty series cases for overall form
     stats = {
-        'OverallPoints': relevant_matches['Points'].rolling(window=window).mean().iloc[-1] if len(relevant_matches['Points']) >= window else None,
-        'GoalsScored': relevant_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(relevant_matches['GoalsScored']) >= window else None,
-        'GoalsConceded': relevant_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(relevant_matches['GoalsConceded']) >= window else None,
-        'GoalDifference': (relevant_matches['GoalsScored'] - relevant_matches['GoalsConceded']).rolling(window=window).mean().iloc[-1] if len(relevant_matches['GoalsScored']) >= window else None
+        'OverallPoints': relevant_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
+            relevant_matches['Points']) >= window else None,
+        'GoalsScored': relevant_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
+            relevant_matches['GoalsScored']) >= window else None,
+        'GoalsConceded': relevant_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
+            relevant_matches['GoalsConceded']) >= window else None,
+        'GoalDifference':
+            (relevant_matches['GoalsScored'] - relevant_matches['GoalsConceded']).rolling(window=window).mean().iloc[
+                -1] if len(relevant_matches['GoalsScored']) >= window else None
     }
 
     # Calculate home and away form separately
-    stats['HomeFormPoints'] = home_matches['Points'].rolling(window=window).mean().iloc[-1] if len(home_matches['Points']) >= window else None
-    stats['AwayFormPoints'] = away_matches['Points'].rolling(window=window).mean().iloc[-1] if len(away_matches['Points']) >= window else None
+    stats['HomeFormPoints'] = home_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
+        home_matches['Points']) >= window else None
+    stats['AwayFormPoints'] = away_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
+        away_matches['Points']) >= window else None
 
     # Calculate home and away goal stats separately
-    stats['HomeGoalsScored'] = home_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(home_matches['GoalsScored']) >= window else None
-    stats['AwayGoalsScored'] = away_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(away_matches['GoalsScored']) >= window else None
+    stats['HomeGoalsScored'] = home_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
+        home_matches['GoalsScored']) >= window else None
+    stats['AwayGoalsScored'] = away_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
+        away_matches['GoalsScored']) >= window else None
 
-    stats['HomeGoalsConceded'] = home_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(home_matches['GoalsConceded']) >= window else None
-    stats['AwayGoalsConceded'] = away_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(away_matches['GoalsConceded']) >= window else None
+    stats['HomeGoalsConceded'] = home_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
+        home_matches['GoalsConceded']) >= window else None
+    stats['AwayGoalsConceded'] = away_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
+        away_matches['GoalsConceded']) >= window else None
 
-    stats['HomeGoalDifference'] = (home_matches['GoalsScored'] - home_matches['GoalsConceded']).rolling(window=window).mean().iloc[-1] if len(home_matches['GoalsScored']) >= window else None
-    stats['AwayGoalDifference'] = (away_matches['GoalsScored'] - away_matches['GoalsConceded']).rolling(window=window).mean().iloc[-1] if len(away_matches['GoalsScored']) >= window else None
+    stats['HomeGoalDifference'] = \
+    (home_matches['GoalsScored'] - home_matches['GoalsConceded']).rolling(window=window).mean().iloc[-1] if len(
+        home_matches['GoalsScored']) >= window else None
+    stats['AwayGoalDifference'] = \
+    (away_matches['GoalsScored'] - away_matches['GoalsConceded']).rolling(window=window).mean().iloc[-1] if len(
+        away_matches['GoalsScored']) >= window else None
 
     return stats
+
 
 def preprocessing_season_optimized(season_df, season, league_name, windows=None):
     if windows is None:
@@ -134,7 +151,27 @@ def preprocessing_season_optimized(season_df, season, league_name, windows=None)
 
     data = create_seasonal_features(data.copy())
 
+    data = data.rename(columns={'FTHG': 'home_goals',
+                                'FTAG': 'away_goals',
+                                'FTR': 'result_1X2',
+                                'B365H': 'bet_1',
+                                'B365D': 'bet_X',
+                                'B365A': 'bet_2'})
+    data = data[data['result_1X2'].notnull()]
+    data['result_1X2'] = data['result_1X2'].apply(encode_result)
+
     return data
+
+
+def encode_result(x):
+    if str(x) == "H":
+        return "1"
+    elif str(x) == "A":
+        return "2"
+    elif str(x) == "D":
+        return "X"
+    else:
+        raise AttributeError(f'No match result value found for >> {x} << ')
 
 
 def create_seasonal_features(data):
@@ -187,7 +224,6 @@ def create_seasonal_features(data):
 
     return data
 
-
 # def preprocessing_season(season_df, n_season, league_name):
 #     data = season_df.copy(deep=True)
 #
@@ -201,4 +237,3 @@ def create_seasonal_features(data):
 #     data = calculate_team_based_match_day(data)
 #
 #     return data
-

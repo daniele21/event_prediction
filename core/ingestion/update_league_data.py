@@ -1,7 +1,20 @@
+import pandas as pd
 
 from core.dataset_manager.db_manager import DatabaseManager
 from core.logger import logger
+from core.utils import get_most_recent_data_path
 
+
+def get_most_recent_data(dataset_params):
+    league_name = dataset_params['league_name']
+    league_dir = dataset_params['league_dir'] + league_name + '/'
+    windows = dataset_params['windows']
+
+    league_path = get_most_recent_data_path(league_dir, league_name, windows)
+    if league_path:
+        return pd.read_csv(league_path, index_col=0)
+    else:
+        return update_data_league(dataset_params)
 
 def update_data_league(params):
 

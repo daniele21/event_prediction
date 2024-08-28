@@ -7,10 +7,14 @@ def split_data(x, y,
                target_match_day=18,
                test_match_day=2,
                last_n_seasons=5,
+               drop_last_seasons=None,
                drop_first_n=0,
                drop_last_n=0):
+    drop_last_seasons = None if drop_last_seasons == 0 else -drop_last_seasons
+
     # Season filter
-    seasons = x[SEASON].unique()[-last_n_seasons:].tolist()
+    seasons = x[SEASON].unique()[-last_n_seasons:drop_last_seasons].tolist()
+    print(f'Taking seasons: {seasons}')
     x_train = x[x[SEASON].isin(seasons)]
 
     # Drop matches

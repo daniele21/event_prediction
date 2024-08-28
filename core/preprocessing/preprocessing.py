@@ -31,9 +31,9 @@ def calculate_h2h_stats(df, home_team, away_team, match_date, window=5):
         return pd.Series([np.nan, np.nan, np.nan], index=['H2H_HomeWinRate', 'H2H_AwayWinRate', 'H2H_GoalDifference'])
 
     # Calculate win rates for both home and away perspectives
-    home_wins = len(h2h_matches[(h2h_matches['HomeTeam'] == home_team) & (h2h_matches['FTR'] == 'H')])
-    away_wins = len(h2h_matches[(h2h_matches['AwayTeam'] == away_team) & (h2h_matches['FTR'] == 'A')])
-    draws = len(h2h_matches[h2h_matches['FTR'] == 'D'])
+    home_wins = len(h2h_matches[(h2h_matches['HomeTeam'] == home_team) & (h2h_matches['result_1X2'] == '1')])
+    away_wins = len(h2h_matches[(h2h_matches['AwayTeam'] == away_team) & (h2h_matches['result_1X2'] == '2')])
+    draws = len(h2h_matches[h2h_matches['result_1X2'] == 'X'])
 
     total_matches = len(h2h_matches)
 
@@ -41,8 +41,8 @@ def calculate_h2h_stats(df, home_team, away_team, match_date, window=5):
     away_win_rate = (away_wins + draws * 0.5) / total_matches
 
     # Goal difference calculation (home goals - away goals)
-    home_goals = h2h_matches.apply(lambda row: row['FTHG'] if row['HomeTeam'] == home_team else row['FTAG'], axis=1)
-    away_goals = h2h_matches.apply(lambda row: row['FTAG'] if row['HomeTeam'] == home_team else row['FTHG'], axis=1)
+    home_goals = h2h_matches.apply(lambda row: row['home_goals'] if row['HomeTeam'] == home_team else row['away_goals'], axis=1)
+    away_goals = h2h_matches.apply(lambda row: row['away_goals'] if row['HomeTeam'] == home_team else row['home_goals'], axis=1)
 
     goal_difference = (home_goals - away_goals).mean()
 
