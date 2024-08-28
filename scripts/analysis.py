@@ -57,6 +57,7 @@ def season_analysis(data):
     performance[precision_cols].mean(axis=0).plot(label='precision')
     performance[recall_cols].mean(axis=0).plot(label='recall')
     performance[f1_cols].mean(axis=0).plot(label='f1')
+    plt.title(data['league'].iloc[0])
     plt.legend()
     plt.grid()
     plt.show()
