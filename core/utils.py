@@ -1,6 +1,32 @@
-from datetime import datetime
+import json
 import os
+import pickle
+from datetime import datetime
 
+
+def load_json(filepath):
+    with open(filepath, 'rb') as f:
+        content = json.load(f)
+        f.close()
+
+    return content
+
+
+def save_json(content, filepath):
+    with open(filepath, 'w') as f:
+        json.dump(content, f, indent=4)
+        f.close()
+
+
+def load_pickle(input_filename):
+    with open(input_filename, 'rb') as filename:
+        loaded_object = pickle.load(filename)
+    return loaded_object
+
+
+def save_pickle(input_object, output_filename):
+    with open(output_filename, 'wb') as filename:
+        pickle.dump(input_object, filename)
 
 
 def get_timestamp():
@@ -15,7 +41,7 @@ def ensure_folder(folder_dir):
     return False
 
 
-def get_most_recent_data(league_dir, league_name, windows):
+def get_most_recent_data_path(league_dir, league_name, windows):
     if league_dir is None or not os.path.exists(league_dir):
         return None
 
