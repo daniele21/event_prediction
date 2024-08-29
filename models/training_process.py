@@ -2,6 +2,8 @@ import pandas as pd
 from sklearn.metrics import recall_score, precision_score, f1_score
 from tqdm import tqdm
 
+from scripts.training.validation import check_calibration
+
 
 def training_process(datasets, estimator, params, inference=False):
     model_scores = pd.DataFrame()
@@ -18,14 +20,20 @@ def training_process(datasets, estimator, params, inference=False):
             y_train = pd.concat((y_train, y_test), axis=0)
 
         # Create and train the model
-        model.fit(x_train, y_train.squeeze())
+        if estimator.__name__ == 'LGBMClassifier':
+            model.fit(x_train, y_train.squeeze(),
+                      eval_set=[(x_train, y_train), (x_test, y_test)])
+        else:
+            model.fit(x_train, y_train.squeeze())
 
         # Evaluate the model
-        predictions = model.predict(x_target) if inference else model.predict(x_test)
-        probabilities = model.predict_proba(x_target) if inference else model.predict_proba(x_test)
-        recall = recall_score(y_target, predictions, average='weighted')
-        precision = precision_score(y_target, predictions, average='weighted')
-        f1 = f1_score(y_target, predictions, average='weighted')
+        x_valid_set = x_target if inference else x_test
+        y_valid_set = y_target if inference else y_test
+        predictions = model.predict(x_valid_set)
+        probabilities = model.predict_proba(x_valid_set)
+        recall = recall_score(y_valid_set, predictions, average='weighted')
+        precision = precision_score(y_valid_set, predictions, average='weighted')
+        f1 = f1_score(y_valid_set, predictions, average='weighted')
 
         scores = {'estimator': estimator.__name__,
                   **params,
@@ -36,7 +44,7 @@ def training_process(datasets, estimator, params, inference=False):
         scores_df = pd.DataFrame(scores, index=[i])
         model_scores = pd.concat((model_scores, scores_df))
 
-        prob_df = pd.concat((x_target, pd.DataFrame(probabilities, index=x_target.index)), axis=1)
+        prob_df = pd.concat((x_valid_set, pd.DataFrame(probabilities, index=x_valid_set.index)), axis=1)
         model_probabilities = pd.concat((model_probabilities, prob_df), axis=0)
 
     model_scores = model_scores.reset_index()\

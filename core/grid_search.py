@@ -1,12 +1,12 @@
 from itertools import product
 
-import lightgbm
 import pandas as pd
 from sklearn.metrics import recall_score, precision_score, f1_score, log_loss
-import numpy as np
+from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
-from sklearn.calibration import calibration_curve, CalibratedClassifierCV
-import matplotlib.pyplot as plt
+
+from core.utils import get_estimator
+
 
 def grid_search(estimator, datasets, param_grid):
     # Create a list of all parameter combinations
@@ -25,9 +25,9 @@ def grid_search(estimator, datasets, param_grid):
             y_train, y_test = dataset['train']['y'], dataset['test']['y']
 
             # Create and train the model
-            if isinstance(estimator, lightgbm.sklearn.LGBMClassifier):
+            if estimator.__name__ in 'LGBMClassifier':
                 model.fit(x_train, y_train.squeeze(),
-                          eval_set=[(x_test, y_test)])
+                          eval_set=[(x_train, y_train), (x_test, y_test)])
             else:
                 model.fit(x_train, y_train.squeeze())
 
@@ -48,7 +48,7 @@ def grid_search(estimator, datasets, param_grid):
             scores_df = pd.DataFrame(scores, index=[i])
             params_scores = pd.concat((params_scores, scores_df))
 
-            prob_df = pd.concat((x_test, pd.DataFrame(probabilities, index=x_target.index)), axis=1)
+            prob_df = pd.concat((x_test, pd.DataFrame(probabilities, index=x_test.index)), axis=1)
             model_probabilities = pd.concat((model_probabilities, prob_df), axis=0)
 
         for x in ['recall', 'precision', 'f1', 'log_loss']:
@@ -60,3 +60,28 @@ def grid_search(estimator, datasets, param_grid):
     model_probabilities = model_probabilities.rename(columns={0: 'X', 1: '1', 2: '2'})
 
     return final_scores, model_probabilities
+
+
+def grid_search_regression(dataset, strategy_params):
+    estimator = get_estimator(strategy_params['estimator'])
+    param_grid = strategy_params['param_grid']
+    scoring = strategy_params['scoring']
+    cv_fold = strategy_params['cv_fold']
+
+    x_train, y_train = dataset['train']['x'], dataset['train']['y']
+    x_test, y_test = dataset['test']['x'], dataset['test']['y']
+
+    grid_search = GridSearchCV(estimator=estimator(),
+                               param_grid=param_grid,
+                               cv=cv_fold,
+                               scoring=scoring,
+                               n_jobs=-1,
+                               verbose=1)
+
+    # Perform grid search on the filtered training data
+    grid_search.fit(x_train, y_train)
+
+    # Get the best parameters and the best score from the grid search
+    best_params = grid_search.best_params_
+
+    return estimator, best_params

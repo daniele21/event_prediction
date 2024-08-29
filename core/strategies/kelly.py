@@ -26,5 +26,5 @@ def flat_strategy(bet, budget=1):
     return {'spent': budget,
             'potential_gain': budget * bet}
 
-def prob_margin_strategy(bet, prob_margin, budget, margin_thr=(-1,1)) - dict:
+def prob_margin_strategy(bet, prob_margin, budget, margin_thr=(-1,1)) -> dict:
     pass

@@ -3,6 +3,8 @@ import os
 import pickle
 from datetime import datetime
 
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+import lightgbm as lgbm
 
 def load_json(filepath):
     with open(filepath, 'rb') as f:
@@ -40,6 +42,20 @@ def ensure_folder(folder_dir):
 
     return False
 
+def get_estimator(estimator):
+    if isinstance(estimator, str):
+        if str("RandomForestClassifier").lower() == estimator.lower():
+            return RandomForestClassifier
+        elif str("RandomForestRegressor").lower() == estimator.lower():
+            return RandomForestRegressor
+        elif str("LGBMClassifier").lower() == estimator.lower():
+            return lgbm.LGBMClassifier
+        elif str("LGBMRegressor").lower() == estimator.lower():
+            return lgbm.LGBMRegressor
+        else:
+            raise AttributeError(f'Estimator not found: {estimator}')
+    else:
+        return estimator
 
 def get_most_recent_data_path(league_dir, league_name, windows):
     if league_dir is None or not os.path.exists(league_dir):

@@ -22,19 +22,20 @@ def tuning(data, dataset_params, model_params):
 
 if __name__ == '__main__':
     league_name = LEAGUE.SERIE_A
-    npm = 5
+    windows = [1, 3, 5]
     test_name = 'target_2324'
 
     league_dir = f'resources/{league_name}/'
-    source_data = get_most_recent_data(league_dir, league_name, n_prev_match=npm)
+    source_data = get_most_recent_data(league_dir, league_name, windows=windows)
 
     dataset_params = {'drop_last': 5,
                       'drop_first': 5,
                       'last_n_seasons': 13,
-                      'target_match_days': np.arange(7, 31),
+                      'target_match_days': np.arange(8, 30),
                       'test_match_day': 2,
                       'preprocessing_version': MATCH_RESULT_V1,
                       }
+
     # RF
     # param_grid = {
     #     'n_estimators': [300],  # Number of trees in the forest
@@ -51,16 +52,17 @@ if __name__ == '__main__':
     # LGBM
     param_grid = {
         'num_leaves': [5, 10, 15],  # [10, 20, 30],
-        'max_depth': [5, 10, 30],  # [5, 10, 20, 45],
+        'max_depth': [5, 10, 15],  # [5, 10, 20, 45],
         # 'min_data_in_leaf': [10, 20, 30],
-        'feature_fraction': [0.8, 1],
-        'learning_rate': [0.1, 0.5, 0.01],
-        'n_estimators': [300],
+        #'feature_fraction': [0.8, 1],
+        'learning_rate': [0.1],
+        'n_estimators': [100],
         # 'lambda_l1': [0, 0.2],
         # 'lambda_l2': [0, 0.2],
         # 'num_iteration': [50000],
-        # 'early_stopping_round': [10, 30],
-        'class_weight': ['balanced', None],
+        'early_stopping_round': [10],
+        # 'class_weight': ['balanced', None],
+        'class_weight': [None],
         'deterministic': [True],
         'seed': [2024]
     }
