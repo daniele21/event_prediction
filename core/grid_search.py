@@ -77,9 +77,13 @@ def grid_search_regression(dataset, strategy_params):
                                scoring=scoring,
                                n_jobs=-1,
                                verbose=1)
+    if estimator.__name__ == 'LGBMRegressor':
+        fit_params = {'eval_set': [(x_train, y_train), (x_test, y_test)]}
+    else:
+        fit_params = {}
 
     # Perform grid search on the filtered training data
-    grid_search.fit(x_train, y_train)
+    grid_search.fit(x_train, y_train.squeeze(), **fit_params)
 
     # Get the best parameters and the best score from the grid search
     best_params = grid_search.best_params_

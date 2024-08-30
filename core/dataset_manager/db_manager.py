@@ -79,8 +79,8 @@ def update_league_data(league_df, windows):
 
     update = False
     league_paths = get_league_csv_paths(league_name)
-    league_path_list = [x for x in league_paths if str(last_season) in x]
-    league_path = league_path_list[0] if len(league_path_list) > 0 else None
+    league_seasons = [x.split('/')[-2] for x in league_paths]
+    league_path = league_paths[-1]
 
     season_df = extract_season_data(league_path, last_season, league_name)
 
@@ -88,12 +88,11 @@ def update_league_data(league_df, windows):
     last_date = pd.to_datetime(league_df.iloc[-1]['Date'])
     update_date = season_df.iloc[-1]['Date']
 
-    if update_date > last_date:
+    if str(last_season) != str(league_seasons[-1]) or update_date > last_date:
         update_df = pd.DataFrame()
-        update_df = update_df.append(season_df, sort=False) \
-            .reset_index(drop=True)
+        update_df = pd.concat((update_df, season_df)).reset_index(drop=True)
         update_df = update_df[update_df['Date'] > last_date]
-        league_df = league_df.append(update_df).reset_index(drop=True)
+        league_df = pd.concat((league_df, update_df)).reset_index(drop=True)
         update = True
 
         # ----------------------------------

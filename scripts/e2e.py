@@ -6,6 +6,7 @@ import numpy as np
 from core.dataset.dataset_generation import generate_datasets
 from core.grid_search import grid_search_regression
 from core.ingestion.update_league_data import get_most_recent_data
+from core.logger import logger
 from core.simulation.simulation_data import enrich_data_for_simulation
 from core.simulation.strategy import extract_margin_matches
 from core.utils import load_json, ensure_folder, save_json, get_timestamp, save_pickle
@@ -55,25 +56,30 @@ def training_and_test_section(data, dataset_params, training_params, params, sav
     if save_folder:
         print(f'Saving Training results at: {save_folder}')
 
-        model_path = f'{save_folder}/model.pkl'
+        model_path = f'{save_folder}/class_model.pkl'
+        logger.info(f' > Saving Classification Model at {model_path}')
         save_pickle(model, model_path)
 
         model_scores_path = f'{save_folder}/model_scores.csv'
+        logger.info(f' > Saving Classification Model scores at {model_scores_path}')
         model_scores.to_csv(model_scores_path)
 
         prediction_path = f'{save_folder}/model_prediction.csv'
+        logger.info(f' > Saving Classification Prediction at {prediction_path}')
         prediction.to_csv(prediction_path)
 
         bet_plays_path = f'{save_folder}/bet_plays.csv'
+        logger.info(f' > Saving bet plays at {bet_plays_path}')
         bet_plays.to_csv(bet_plays_path)
 
         calibration_path = f'{save_folder}/test_calibration.png'
+        logger.info(f' > Saving model calibration at {calibration_path}')
         fig.savefig(calibration_path)
 
-    return model, bet_plays
+    return model, bet_plays, fig
 
 
-def strategy(bet_plays, strategy_config, save_folder=None):
+def net_prediction_model(bet_plays, strategy_config, save_folder=None):
     df = bet_plays.copy(deep=True)
     df = df[df['kelly'] > 0].drop_duplicates()
 
@@ -99,7 +105,7 @@ def strategy(bet_plays, strategy_config, save_folder=None):
 
     if estimator.__name__ == 'LGBMRegressor':
         net_model.fit(x_train, y_train.squeeze(),
-                  eval_set=[(x_train, y_train), (x_test, y_test)])
+                      eval_set=[(x_train, y_train), (x_test, y_test)])
     else:
         net_model.fit(x_train, y_train.squeeze())
 
@@ -111,32 +117,28 @@ def strategy(bet_plays, strategy_config, save_folder=None):
     print(f'Net Regression MAE on train set: {train_mae}')
     print(f'Net Regression MAE on test set: {test_mae}')
 
+    x_test = df[['match_day']].merge(x_test, how='right', left_index=True, right_index=True)
     x_test = x_test.merge(df[['net', 'win']], how='left', left_index=True, right_index=True)
     x_test.loc[:, 'predicted_net'] = y_test_pred
-    x_test['bet_decision'] = x_test['predicted_net'].apply(lambda x: 1 if x > 0 else 0)
-    x_test = x_test.sort_index()
-
-    class_report = classification_report(x_test['win'].astype(int), x_test['bet_decision'],
-                                         output_dict=True)
-    print(f'Bet Decision Classification Report | Test')
-    print(classification_report(x_test['win'].astype(int), x_test['bet_decision']))
-
-    fig = plot_profit_loss(x_test[x_test['bet_decision'] == 1], show=False)
 
     if save_folder:
-        pl_path = f'{save_folder}/pl_strategy_on_test_set.png'
-        fig.savefig(pl_path)
+        # pl_path = f'{save_folder}/pl_strategy_on_test_set.png'
+        # logger.info(f' > Saving Profit/Loss on test set at {pl_path}')
+        # fig.savefig(pl_path)
 
-        test_bet_path = f'{save_folder}/bet_decision_test.csv'
-        x_test.to_csv(test_bet_path)
+        # test_bet_path = f'{save_folder}/bet_decision_test.csv'
+        # logger.info(f' > Saving bet decision test set at {test_bet_path}')
+        # x_test.to_csv(test_bet_path)
 
-        class_report_path = f'{save_folder}/bet_decision_class_report_test.csv'
-        pd.DataFrame(class_report).T.to_csv(class_report_path)
+        # class_report_path = f'{save_folder}/bet_decision_class_report_test.csv'
+        # logger.info(f' > Saving bet decision classification report test set at {class_report_path}')
+        # pd.DataFrame(class_report).T.to_csv(class_report_path)
 
-        net_model_path = f'{save_folder}/net_model.pkl'
+        net_model_path = f'{save_folder}/net_prediction_model.pkl'
+        logger.info(f' > Saving Net Model at {net_model_path}')
         save_pickle(net_model, net_model_path)
 
-    return net_model
+    return net_model, x_test
 
 
 def backtesting(data, dataset_params, class_model, net_model, save_folder=None):
@@ -146,7 +148,6 @@ def backtesting(data, dataset_params, class_model, net_model, save_folder=None):
     datasets = generate_datasets(data, dataset_params)
 
     for i, dataset in datasets.items():
-
         x_target = dataset['target']['x']
         y_target = dataset['target']['y']
 
@@ -155,7 +156,7 @@ def backtesting(data, dataset_params, class_model, net_model, save_folder=None):
         recall = recall_score(y_target, predictions, average='weighted')
         precision = precision_score(y_target, predictions, average='weighted')
         f1 = f1_score(y_target, predictions, average='weighted')
-        ll = log_loss(y_target, probabilities, labels=[0,1,2])
+        ll = log_loss(y_target, probabilities, labels=[0, 1, 2])
 
         scores = {'recall': recall,
                   'precision': precision,
@@ -220,7 +221,7 @@ def backtesting(data, dataset_params, class_model, net_model, save_folder=None):
 
 
 if __name__ == '__main__':
-    exp_prefix = 'test'
+    exp_prefix = 'last_7_seasons-2'
 
     dataset_config = load_json('config/dataset.json')
     training_config = load_json('config/training_lgbm.json')
@@ -239,15 +240,15 @@ if __name__ == '__main__':
 
     # Training & Test
     class_model, bet_plays = training_and_test_section(source_data,
-                                                 dataset_config,
-                                                 training_config,
-                                                 best_params,
-                                                 save_folder=e2e_folder)
+                                                       dataset_config,
+                                                       training_config,
+                                                       best_params,
+                                                       save_folder=e2e_folder)
 
     # Strategy
-    net_model = strategy(bet_plays,
-                         strategy_config,
-                         save_folder=e2e_folder)
+    net_model = net_prediction_model(bet_plays,
+                                     strategy_config,
+                                     save_folder=e2e_folder)
 
     # Backtesting
     backtesting(source_data,

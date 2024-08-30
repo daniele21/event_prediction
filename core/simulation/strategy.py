@@ -54,4 +54,6 @@ def extract_margin_matches(simulation_data, margin_thr=-100, kelly_thr=-100):
     plays['net'] = plays['gain'] - plays['spent']
     plays['net_rate'] = plays['net'] / plays['spent']
 
+    plays = plays.drop_duplicates()
+
     return plays

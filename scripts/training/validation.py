@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
+import matplotlib
+matplotlib.use('Agg')
 
 def compute_calibration(df, prob_col, event_label):
     df = df[df['choice'] == event_label]
@@ -88,5 +90,7 @@ def check_calibration(data, prob_col, title='', show=True):
 
     if show:
         plt.show()
+    else:
+        plt.close(fig)
 
     return fig

@@ -10,9 +10,9 @@ def create_update_league_data(params):
 
 if __name__ == '__main__':
     league_name = LEAGUE.SERIE_A
-    npm = 5
+    windows = [1,3,5]
     params = {'league_name': league_name,
-              'windows': [1, 3, 5],
+              'windows': windows,
               'league_dir': f"resources/",
               'update': True}
 

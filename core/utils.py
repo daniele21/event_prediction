@@ -2,6 +2,7 @@ import json
 import os
 import pickle
 from datetime import datetime
+from core.logger import logger
 
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 import lightgbm as lgbm
