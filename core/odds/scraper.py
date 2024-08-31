@@ -48,6 +48,7 @@ def load_next_odds(league_name):
     for match, side_ids in zip(scraper.prematch_odds, scraper.side_ids):
 
         odds_dict = {'match_day': [],
+                     'date': [],
                      'HomeTeam': [],
                      'AwayTeam': [],
                      'bookmaker': [],
@@ -60,6 +61,7 @@ def load_next_odds(league_name):
             bet_1, bet_x, bet_2 = _get_odd_event(odd_item, side_ids)
 
             odds_dict['match_day'].append(match['match_day'])
+            odds_dict['date'].append(match['date'])
             odds_dict['HomeTeam'].append(match['home_team'])
             odds_dict['AwayTeam'].append(match['visiting_team'])
             odds_dict['bookmaker'].append(bookmaker_name)
@@ -71,6 +73,10 @@ def load_next_odds(league_name):
         next_matches = pd.concat((next_matches, odds_df))
 
     next_matches = next_matches.reset_index(drop=True)
+    next_matches['bet_1'] = next_matches['bet_1'].astype(float)
+    next_matches['bet_X'] = next_matches['bet_X'].astype(float)
+    next_matches['bet_2'] = next_matches['bet_2'].astype(float)
+    next_matches['match_day'] = next_matches['match_day'].astype(int)
 
     return next_matches
 
@@ -175,11 +181,13 @@ class BookmakersScraper:
         home_teams = re.findall(r"¬CX÷(.*?)¬ER÷", text)
         visiting_teams = re.findall(r"¬AF÷(.*?)¬FK÷", text)
         match_days = re.findall(r"¬ER÷Giornata (.*?)¬RW÷0", text)
+        timestamp_seconds = re.findall(r"¬AD÷(.*?)¬ADE÷", text)
+        date = pd.to_datetime(timestamp_seconds, unit='s')
 
         # Return the first 10 matches
         # return match_ids[:10], home_teams[:10], visiting_teams[:10], match_days[:10]
 
-        return match_ids, home_teams, visiting_teams, match_days
+        return match_ids, home_teams, visiting_teams, match_days, date
 
     def fetch_bookmaker_data(self, match_id, _hash):
         """
@@ -253,10 +261,10 @@ class BookmakersScraper:
             return
 
         # Extract match IDs, home teams, and visiting teams from the script
-        match_ids, home_teams, visiting_teams, match_days = self.extract_match_data(script_content)
+        match_ids, home_teams, visiting_teams, match_days, dates = self.extract_match_data(script_content)
 
         # Collect bookmaker data for each match
-        for match_id, home, visiting, match_day in zip(match_ids, home_teams, visiting_teams, match_days):
+        for match_id, home, visiting, match_day, date in zip(match_ids, home_teams, visiting_teams, match_days, dates):
             odds_data = self.fetch_bookmaker_data(match_id, self.KEY_PREMATCH_ODDS)
             event_data = self.fetch_event_info(match_id, self.KEY_EVENT_INFO)
             self.team_ids.append({x['id']: x['name'] for x in event_data})
@@ -267,6 +275,7 @@ class BookmakersScraper:
                     {
                         "match_id": match_id,
                         "match_day": match_day,
+                        "date": date,
                         "home_team": home,
                         "visiting_team": visiting,
                         "odds": odds_data,
