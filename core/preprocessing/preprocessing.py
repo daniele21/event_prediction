@@ -6,21 +6,8 @@ import os
 from tqdm import tqdm
 
 from core.logger import logger
-# from core.str2bool import str2bool
-# from scripts.data import constants as K
-# from scripts.data.data_utils import (search_previous_matches,
-#                                      search_future_features,
-#                                      search_future_WDL,
-#                                      search_future_opponent,
-#                                      search_future_home,
-#                                      search_future_bet_WD,
-#                                      compute_outcome_match,
-#                                      convert_result_1X2_to_WDL, compute_outcome_points)
-# from core.logger.logging import logger
-# from core.file_manager.os_utils import exists
 from core.time_decorator import timing
-from multiprocessing import Pool
-from functools import partial
+
 
 def calculate_h2h_stats(df, home_team, away_team, match_date, window=5):
     h2h_matches = df[((df['HomeTeam'] == home_team) & (df['AwayTeam'] == away_team)) |
@@ -41,8 +28,10 @@ def calculate_h2h_stats(df, home_team, away_team, match_date, window=5):
     away_win_rate = (away_wins + draws * 0.5) / total_matches
 
     # Goal difference calculation (home goals - away goals)
-    home_goals = h2h_matches.apply(lambda row: row['home_goals'] if row['HomeTeam'] == home_team else row['away_goals'], axis=1)
-    away_goals = h2h_matches.apply(lambda row: row['away_goals'] if row['HomeTeam'] == home_team else row['home_goals'], axis=1)
+    home_goals = h2h_matches.apply(lambda row: row['home_goals'] if row['HomeTeam'] == home_team else row['away_goals'],
+                                   axis=1)
+    away_goals = h2h_matches.apply(lambda row: row['away_goals'] if row['HomeTeam'] == home_team else row['home_goals'],
+                                   axis=1)
 
     goal_difference = (home_goals - away_goals).mean()
 
@@ -103,9 +92,6 @@ def _bind_matches(league_df, team, date, n_prev_match, index, home):
         league_df.loc[index, last_match_col] = compute_outcome_match(team, prev_matches['none'], i)
 
     return league_df
-
-
-
 
 
 def _bind_trend_last_previous_match(league_df, n_prev_match):
@@ -211,12 +197,6 @@ def _compute_cumultive_points(season_df, team):
             season_df.loc[index, 'away_league_points'] = cum_points[i]
 
     return season_df
-
-
-
-
-
-
 
 
 def _split_teams_one_row(data, i_row, n_prev_match, home):

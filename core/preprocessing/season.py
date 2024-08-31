@@ -162,7 +162,6 @@ def preprocessing_season_optimized(season_df, season, league_name, windows=None)
 
     return data
 
-
 def encode_result(x):
     if str(x) == "H":
         return "1"
@@ -170,6 +169,8 @@ def encode_result(x):
         return "2"
     elif str(x) == "D":
         return "X"
+    elif str(x) == 'UNKNOWN':
+        return str(x)
     else:
         raise AttributeError(f'No match result value found for >> {x} << ')
 

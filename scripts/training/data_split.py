@@ -10,10 +10,11 @@ def split_data(x, y,
                drop_last_seasons=None,
                drop_first_n=0,
                drop_last_n=0):
-    drop_last_seasons = None if drop_last_seasons == 0 else -drop_last_seasons
-
+    last_n_seasons = None if last_n_seasons == 0 else -abs(last_n_seasons)
+    drop_last_seasons = None if drop_last_seasons == 0 else -abs(drop_last_seasons)
+    x[SEASON] = x[SEASON].astype(int)
     # Season filter
-    seasons = x[SEASON].unique()[-last_n_seasons:drop_last_seasons].tolist()
+    seasons = x[SEASON].unique()[last_n_seasons:drop_last_seasons].tolist()
     print(f'Taking seasons: {seasons}')
     x_train = x[x[SEASON].isin(seasons)]
 
@@ -25,7 +26,7 @@ def split_data(x, y,
     y_train = y.to_frame().loc[x_train.index, :]
 
     # Split
-    last_season = seasons[-1]
+    last_season = int(seasons[-1])
 
     # Target
     x_target = x_train[(x_train[SEASON] == last_season) & \

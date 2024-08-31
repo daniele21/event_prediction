@@ -2,16 +2,13 @@ from os.path import exists
 
 import pandas as pd
 
-from tqdm import tqdm
-
 import config.league as LEAGUE
+from core.preprocessing.h2h_stats import calculate_h2h_stats
 
 from config.data_path import get_league_csv_paths
 from core.ingestion.load_data import extract_data, extract_season_data
 from core.logger import logger
-from core.preprocessing.data_shift import shift_data_features
-from core.preprocessing.league_preprocessing import feature_engineering_league
-from core.preprocessing.preprocessing import calculate_h2h_stats
+# from core.preprocessing.preprocessing import calculate_h2h_stats
 from core.time_decorator import timing
 from core.utils import get_most_recent_data_path, ensure_folder, get_timestamp
 
@@ -39,11 +36,12 @@ class DatabaseManager:
             league_df = pd.read_csv(league_path, index_col=0)
             league_df, update = update_league_data(league_df, windows) if update else league_df
             if update:
-                for window in windows:
-                    league_df[[f'H2H_HomeWinRate_{window}', f'H2H_AwayWinRate_{window}',
-                               f'H2H_GoalDifference_{window}']] = league_df.apply(
-                        lambda row: calculate_h2h_stats(league_df, row['HomeTeam'], row['AwayTeam'], row['Date'],
-                                                        window), axis=1)
+                league_df = calculate_h2h_stats(league_df, self.params)
+                # for window in windows:
+                #     league_df[[f'H2H_HomeWinRate_{window}', f'H2H_AwayWinRate_{window}',
+                #                f'H2H_GoalDifference_{window}']] = league_df.apply(
+                #         lambda row: calculate_h2h_stats(league_df, row['HomeTeam'], row['AwayTeam'], row['Date'],
+                #                                         window), axis=1)
 
                 logger.info('> Updating league data')
                 ensure_folder(league_dir)
@@ -56,11 +54,12 @@ class DatabaseManager:
         # GENERATING LEAGUE CSV
         else:
             league_df = extract_data(league_name, windows)
-            for window in windows:
-                league_df[[f'H2H_HomeWinRate_{window}', f'H2H_AwayWinRate_{window}',
-                           f'H2H_GoalDifference_{window}']] = league_df.apply(
-                    lambda row: calculate_h2h_stats(league_df, row['HomeTeam'], row['AwayTeam'], row['Date'],
-                                                    window), axis=1)
+            league_df = calculate_h2h_stats(league_df, self.params)
+            # for window in windows:
+            #     league_df[[f'H2H_HomeWinRate_{window}', f'H2H_AwayWinRate_{window}',
+            #                f'H2H_GoalDifference_{window}']] = league_df.apply(
+            #         lambda row: calculate_h2h_stats(league_df, row['HomeTeam'], row['AwayTeam'], row['Date'],
+            #                                         window), axis=1)
 
             ensure_folder(league_dir)
             league_path = f'{league_dir}{league_name}_{"-".join([str(x) for x in windows])}_{get_timestamp()}.csv'
@@ -70,6 +69,7 @@ class DatabaseManager:
         return league_df
 
 
+@timing
 def update_league_data(league_df, windows):
     logger.info('> Updating league data')
     league_name = list(league_df['league'].unique())[0]
