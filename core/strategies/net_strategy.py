@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def positive_net_strategy(data, net_model, info_data='', save_folder=None,
-                          budget=100):
+                          budget=100, inference=False):
 
     df = predict_net(data, net_model)
 
@@ -27,29 +27,33 @@ def positive_net_strategy(data, net_model, info_data='', save_folder=None,
     #     dynamic_budget = pd.concat((dynamic_budget,
     #                                 pd.DataFrame(budget_dict, index=[match_day])))
 
-    class_report = classification_report(df['win'].astype(int),
-                                         df['bet_decision'],
-                                         output_dict=True)
-    print(f'Bet Decision Classification Report | Test')
-    print(classification_report(df['win'].astype(int),
-                                df['bet_decision']))
+    if not inference:
 
-    fig = plot_profit_loss(df[df['bet_decision'] == 1], show=False)
+        class_report = classification_report(df['win'].astype(int),
+                                             df['bet_decision'],
+                                             output_dict=True)
+        print(f'Bet Decision Classification Report | Test')
+        print(classification_report(df['win'].astype(int),
+                                    df['bet_decision']))
 
-    if save_folder:
-        pl_path = f'{save_folder}/positive_net_strategy_on_{info_data}'
-        logger.info(f' > Saving Net/Spent on {info_data} at {pl_path}')
-        fig.savefig(pl_path)
+        fig = plot_profit_loss(df[df['bet_decision'] == 1], show=False)
 
-        bet_path = f'{save_folder}/bet_positive_net_decision_{info_data}.csv'
-        logger.info(f' > Saving bet decision {info_data} at {bet_path}')
-        df.to_csv(bet_path)
+        if save_folder:
+            pl_path = f'{save_folder}/positive_net_strategy_on_{info_data}'
+            logger.info(f' > Saving Net/Spent on {info_data} at {pl_path}')
+            fig.savefig(pl_path)
 
-        class_report_path = f'{save_folder}/bet_positive_net_decision_class_report_{info_data}.csv'
-        logger.info(f' > Saving bet decision classification report {info_data} at {class_report_path}')
-        pd.DataFrame(class_report).T.to_csv(class_report_path)
+            bet_path = f'{save_folder}/bet_positive_net_decision_{info_data}.csv'
+            logger.info(f' > Saving bet decision {info_data} at {bet_path}')
+            df.to_csv(bet_path)
 
-    return fig
+            class_report_path = f'{save_folder}/bet_positive_net_decision_class_report_{info_data}.csv'
+            logger.info(f' > Saving bet decision classification report {info_data} at {class_report_path}')
+            pd.DataFrame(class_report).T.to_csv(class_report_path)
+
+        return df, fig
+
+    return df, None
 
 
 def predict_net(data, net_model):
@@ -59,6 +63,6 @@ def predict_net(data, net_model):
     net_prediction = net_model.predict(df)
 
     df.loc[:, 'predicted_net'] = net_prediction
-    df = data[['match_day', 'net', 'win']].merge(df, how='right', left_index=True, right_index=True)
+    df = data.drop(features, axis=1).merge(df, how='right', left_index=True, right_index=True)
 
     return df
