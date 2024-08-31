@@ -26,7 +26,7 @@ def feature_engineering_league(league_df, n_prev_match):
     league_df.loc[league_df['result_1X2'] == '2', 'home_points'] = 0
     league_df.loc[league_df['result_1X2'] == '2', 'away_points'] = 3
 
-    league_df = league_df[['league', 'season', 'match_n', 'Date',
+    league_df = league_df[['league', 'season', 'match_n', 'match_day', 'Date',
                            'HomeTeam', 'AwayTeam', 'home_goals',
                            'away_goals', 'result_1X2',
                            'bet_1', 'bet_X', 'bet_2',
