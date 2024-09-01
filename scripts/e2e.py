@@ -83,7 +83,7 @@ def net_prediction_model(bet_plays, strategy_config, save_folder=None):
     df = bet_plays.copy(deep=True)
     df = df[df['kelly'] > 0].drop_duplicates()
 
-    features = ['ev', 'kelly', 'prob_margin']
+    features = ['ev', 'prob_margin', 'kelly']
     target = ['net']
 
     x = df[features]
@@ -184,7 +184,7 @@ def backtesting(data, dataset_params, class_model, net_model, save_folder=None):
     df = target_plays.copy(deep=True)
     df = df[df['kelly'] > 0]
 
-    features = ['ev', 'kelly', 'prob_margin']
+    features = ['ev', 'prob_margin', 'kelly']
     target = ['net']
 
     x_target, y_target = df[features], df[target]
@@ -239,7 +239,7 @@ if __name__ == '__main__':
                              save_folder=e2e_folder)
 
     # Training & Test
-    class_model, bet_plays = training_and_test_section(source_data,
+    class_model, bet_plays, _ = training_and_test_section(source_data,
                                                        dataset_config,
                                                        training_config,
                                                        best_params,

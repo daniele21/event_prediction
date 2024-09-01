@@ -16,6 +16,15 @@ def _filter_cols(df):
     return df[cols]
 
 
+def plot_hist_feature(data, feature, hue, bins='auto'):
+    fig = plt.figure(figsize=(10, 6))
+    sns.histplot(data=data, x=feature, bins=bins, hue=hue, palette='coolwarm', alpha=0.7)
+    plt.title(f'{feature}')
+    plt.xlabel(feature)
+    plt.legend()
+    plt.show()
+    return fig
+
 def plot_scatter_features(data, feature_1, feature_2, hue, size=None):
     plt.figure(figsize=(10, 6))
     sns.scatterplot(data=data, x=feature_1, y=feature_2, hue=hue, size=size, palette='coolwarm', alpha=0.7)
@@ -28,11 +37,11 @@ def plot_scatter_features(data, feature_1, feature_2, hue, size=None):
 # def plot_profit_loss(data, show=True):
 #     data['cumulative_net'] = data.sort_index()['net'].cumsum()
 #
-    fig = plt.figure(figsize=(10, 6))
-    plt.plot(data['cumulative_net'])
-    plt.title('Profit/Loss Match Days')
-    plt.xlabel('Match Day')
-    plt.ylabel('Profit/Loss')
+    # fig = plt.figure(figsize=(10, 6))
+    # plt.plot(data['cumulative_net'])
+    # plt.title('Profit/Loss Match Days')
+    # plt.xlabel('Match Day')
+    # plt.ylabel('Profit/Loss')
 #
 #     if show:
 #         plt.show()
@@ -71,7 +80,7 @@ def best_ev(results):
 
 
 def predict_net_revenue(test_df, target_df):
-    features = ['ev', 'kelly', 'prob_margin']
+    features = ['ev', 'prob_margin', 'kelly']
 
     test_df = test_df[test_df['kelly'] > 0]
     target_df = target_df[target_df['kelly'] > 0]
@@ -144,7 +153,7 @@ def predict_net_revenue(test_df, target_df):
 
 
 def learn_decision_boundary(test_df, target_df):
-    features = ['ev', 'kelly', 'prob_margin']
+    features = ['ev', 'prob_margin', 'kelly']
 
     test_df = test_df[test_df['kelly'] > 0]
     target_df = target_df[target_df['kelly'] > 0]

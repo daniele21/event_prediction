@@ -10,6 +10,9 @@ def split_data(x, y,
                drop_last_seasons=None,
                drop_first_n=0,
                drop_last_n=0):
+
+    assert target_match_day - test_match_day > drop_first_n, 'No valid test_match_day - target_match_day - drop_first_n'
+
     last_n_seasons = None if last_n_seasons == 0 else -abs(last_n_seasons)
     drop_last_seasons = None if drop_last_seasons == 0 else -abs(drop_last_seasons)
     x[SEASON] = x[SEASON].astype(int)
@@ -20,13 +23,18 @@ def split_data(x, y,
 
     # Drop matches
     match_days = x_train[MATCH_DAY].max()
+    assert target_match_day < match_days - drop_last_n, 'No valid test_match_day - target_match_day - drop_last_n'
+
     x_train = x_train[(x_train[MATCH_DAY] > drop_first_n) & \
                       (x_train[MATCH_DAY] <= match_days - drop_last_n)]
 
     y_train = y.to_frame().loc[x_train.index, :]
 
+    # Handle Match Days Test & Target
+    last_season = x_train[x_train[MATCH_DAY] == target_match_day]['season'].unique().tolist()[-1]
+
     # Split
-    last_season = int(seasons[-1])
+    # last_season = int(seasons[-1])
 
     # Target
     x_target = x_train[(x_train[SEASON] == last_season) & \

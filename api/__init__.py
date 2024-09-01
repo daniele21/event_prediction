@@ -11,5 +11,6 @@ with app.app_context():
     import api.update
     import api.training
     import api.strategy
+    import api.e2e
     import api.go_live
 
