@@ -10,7 +10,7 @@ from core.simulation.simulation_data import enrich_data_for_simulation
 from core.simulation.strategy import extract_margin_matches
 from core.strategies.net_strategy import positive_net_strategy, high_positive_net_strategy
 from core.utils import load_pickle, load_json
-from scripts.e2e import net_prediction_model
+from scripts.new_e2e import net_prediction_model
 from scripts.model_inference import classification_model_inference
 
 
@@ -21,14 +21,15 @@ def net_prediction():
     source_folder = payload['source_folder']
 
     try:
-        bet_plays_path = f'{source_folder}/bet_plays.csv'
+        bet_plays_path = f'{source_folder}/test_bet_plays.csv'
         bet_plays = pd.read_csv(bet_plays_path, index_col=0)
-        net_model, x_test = net_prediction_model(bet_plays,
+        net_model_dict, net_scaler_dict, x_test = net_prediction_model(bet_plays,
                                                  strategy_params,
                                                  save_folder=source_folder)
 
         _, fig = positive_net_strategy(x_test,
-                                       net_model,
+                                       net_model_dict,
+                                       net_scaler_dict,
                                        info_data='test set',
                                        save_folder=source_folder)
 
@@ -51,16 +52,22 @@ def positive_net_strategy_api():
     payload = request.json
     dataset_params = payload.get('dataset')
     source_folder = payload['source_folder']
+    target_match_day = payload.get("target_match_days")
 
     if dataset_params is None:
         dataset_path = f'{source_folder}/dataset_config.json'
         dataset_params = load_json(dataset_path)
         logger.info(dataset_params)
 
+    if target_match_day:
+        dataset_params["target_match_days"] = target_match_day
+
     class_model_path = f'{source_folder}/class_model.pkl'
     net_model_path = f'{source_folder}/net_prediction_model.pkl'
+    net_scaler_path = f'{source_folder}/net_scaler.pkl'
     class_model = load_pickle(class_model_path)
-    net_model = load_pickle(net_model_path)
+    net_model_dict = load_pickle(net_model_path)
+    net_scaler_dict = load_pickle(net_scaler_path)
 
     data = get_most_recent_data(dataset_params)
 
@@ -68,11 +75,13 @@ def positive_net_strategy_api():
         prediction, probs = classification_model_inference(data, dataset_params, class_model)
 
         # Simulation
-        simulation_data = enrich_data_for_simulation(data, probs)
+        simulation_data = enrich_data_for_simulation(data, probs[['1', 'X', '2']])
         plays = extract_margin_matches(simulation_data)
+        plays['target_day'] = plays['match_day']
 
         _, fig = positive_net_strategy(plays,
-                                       net_model,
+                                       net_model_dict,
+                                       net_scaler_dict,
                                        info_data='target set',
                                        save_folder=source_folder)
 

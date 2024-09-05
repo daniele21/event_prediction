@@ -5,13 +5,16 @@ from scripts.strategy import plot_profit_loss
 import pandas as pd
 
 
-def positive_net_strategy(data, net_model, info_data='', save_folder=None,
+def positive_net_strategy(data, net_model, net_scaler_dict, info_data='', save_folder=None,
                           budget=100, inference=False):
 
-    df = predict_net(data, net_model)
+    df = predict_net(data, net_model, net_scaler_dict)
 
     df['bet_decision'] = df['predicted_net'].apply(lambda x: 1 if x > 0 else 0)
     df = df.sort_values(by='match_day')
+
+    # for day, value in net_model.items():
+    #     print(f'{day}_{value.coef_}')
 
     # budget = 1
     # dynamic_budget = pd.DataFrame()
@@ -107,13 +110,19 @@ def high_positive_net_strategy(data, net_model, info_data='', save_folder=None,
     return df, None
 
 
-def predict_net(data, net_model):
+def predict_net(data, net_model_dict, net_scaler_dict):
     features = ['ev', 'prob_margin', 'kelly']
 
-    df = data[data['kelly'] > 0][features].drop_duplicates()
-    net_prediction = net_model.predict(df)
+    for target_day in data['target_day'].unique():
+        df = data[data['target_day'] == target_day]
+        # df = df[df['kelly'] > 0][features].drop_duplicates()
+        df = df[features].drop_duplicates()
+        if len(list(net_scaler_dict.keys())) > 0:
+            scaled_df = net_scaler_dict[target_day].transform(df)
+            net_prediction = net_model_dict[target_day].predict(scaled_df)
+        else:
+            net_prediction = net_model_dict[target_day].predict(df)
 
-    df = data.drop(features, axis=1).merge(df, how='right', left_index=True, right_index=True)
-    df.loc[:, 'predicted_net'] = net_prediction
+        data.loc[df.index, 'predicted_net'] = net_prediction
 
-    return df
+    return data
