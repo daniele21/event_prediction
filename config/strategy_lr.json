@@ -1,0 +1,11 @@
+{
+        "estimator": "LinearRegression",
+        "param_grid": {
+                "fit_intercept": [true, false],
+                "n_jobs": [-1],
+                "positive": [true, false],
+        },
+        "scoring": "neg_mean_absolute_error",
+        "test_size": 0.2,
+        "cv_fold": 3
+}

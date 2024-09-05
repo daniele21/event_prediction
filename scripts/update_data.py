@@ -66,7 +66,7 @@ def get_next_match_day_data(params):
 
 
 if __name__ == '__main__':
-    league_name = LEAGUE.SERIE_A
+    league_name = LEAGUE.EREDIVISIE
     windows = [1, 3, 5]
     params = {'league_name': league_name,
               'windows': windows,

@@ -2,6 +2,9 @@ import json
 import os
 import pickle
 from datetime import datetime
+
+from sklearn.linear_model import LinearRegression, ElasticNet
+
 from core.logger import logger
 
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
@@ -53,6 +56,10 @@ def get_estimator(estimator):
             return lgbm.LGBMClassifier
         elif str("LGBMRegressor").lower() == estimator.lower():
             return lgbm.LGBMRegressor
+        elif str("LinearRegression").lower() == estimator.lower():
+            return LinearRegression
+        elif str("ElasticNet").lower() == estimator.lower():
+            return ElasticNet
         else:
             raise AttributeError(f'Estimator not found: {estimator}')
     else:

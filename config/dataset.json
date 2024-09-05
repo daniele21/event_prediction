@@ -1,12 +1,15 @@
 {
-  "league_name": "serie_a",
-  "windows": [1,3,5],
-  "league_dir": "resources/",
-  "drop_last_match_days": 5,
-  "drop_first_match_days": 5,
-  "last_n_seasons": 5,
-  "drop_last_seasons": 0,
-  "target_match_days": {"start": 8, "end": 30},
-  "test_match_day": 2,
-  "preprocessing_version": "match_result_v1"
+"league_name": "serie_a",
+        "windows": [1,3,5],
+        "league_dir": "resources/",
+        "drop_last_match_days": 0,
+        "drop_first_match_days": 0,
+        "last_n_seasons": 13,
+        "drop_last_seasons": 1,
+        "target_match_days": {
+            "start":6,
+            "end": 33
+        },
+        "test_match_day": 5,
+        "preprocessing_version": "match_result_v1"
 }

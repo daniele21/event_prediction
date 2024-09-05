@@ -1,7 +1,7 @@
 
 
 def enrich_data_for_simulation(data, probabilities):
-    result = probabilities[['1', 'X', '2']].merge(data[['league', 'season',
+    result = probabilities.merge(data[['league', 'season',
                                                    'match_day', 'match_n', 'Date',
                                                    'HomeTeam', 'AwayTeam', 'result_1X2',
                                                    'bet_1', 'bet_X', 'bet_2']],

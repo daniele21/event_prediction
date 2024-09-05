@@ -1,11 +1,71 @@
 from itertools import product
 
+import numpy as np
 import pandas as pd
-from sklearn.metrics import recall_score, precision_score, f1_score, log_loss
-from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import recall_score, precision_score, f1_score, log_loss, make_scorer
+from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
+from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 
+from core.strategies.custom_loss import profit_based_score, custom_scorer
 from core.utils import get_estimator
+
+
+def ts_grid_search(estimator, datasets, param_grid,
+                   splits=5, max_train_size=5*38*10, test_size=5*10):
+    tscv = TimeSeriesSplit(n_splits=splits,
+                           max_train_size=max_train_size,
+                           test_size=test_size)
+
+    best_params_dict = {}
+    results = pd.DataFrame()
+    for i_day, dataset in tqdm(datasets.items()):
+        x_train, x_test = dataset['train']['x'], dataset['test']['x']
+        y_train, y_test = dataset['train']['y'], dataset['test']['y']
+
+        x_train = x_train.drop(['match_day', 'season'], axis=1)
+        x_test = x_test.drop(['match_day', 'season'], axis=1)
+
+        grid_search = GridSearchCV(estimator=estimator(),
+                                   param_grid=param_grid,
+                                   cv=tscv,
+                                   scoring='neg_log_loss',
+                                   n_jobs=-1,
+                                   verbose=1,
+                                   error_score='raise')
+
+        if estimator.__name__ == 'LGBMClassifier':
+            fit_params = {'eval_set': [(x_test, y_test)]}
+        else:
+            fit_params = {}
+
+        # Fit GridSearchCV
+        grid_search.fit(x_train, y_train, **fit_params)
+        best_params = grid_search.best_params_
+
+        if estimator.__name__ in 'LGBMClassifier':
+            num_iterations = grid_search.best_estimator_._best_iteration
+            best_params['num_iterations'] = num_iterations
+
+        test_results = pd.DataFrame()
+        for i in range(splits):
+            feature = f'split{i}_test_score'
+            test_result = pd.DataFrame(grid_search.cv_results_[feature], columns=[feature])
+            test_results = test_results.merge(test_result,
+                                              left_index=True,
+                                              right_index=True,
+                                              how='outer')
+        cv_params = pd.DataFrame(grid_search.cv_results_['params'])
+        test_results = test_results.merge(cv_params,
+                           left_index=True,
+                           right_index=True,
+                           )
+        test_results['target_day'] = i_day
+        best_params_dict[i_day] = best_params
+
+    results = pd.concat((results, test_results))
+
+    return best_params_dict, results
 
 
 def grid_search(estimator, datasets, param_grid):
@@ -24,12 +84,20 @@ def grid_search(estimator, datasets, param_grid):
             x_train, x_test = dataset['train']['x'], dataset['test']['x']
             y_train, y_test = dataset['train']['y'], dataset['test']['y']
 
+            x_train = x_train.drop(['match_day', 'season'], axis=1)
+            x_test = x_test.drop(['match_day', 'season'], axis=1)
+            # x_target = x_target.drop(['match_day', 'season'], axis=1)
+
             # Create and train the model
             if estimator.__name__ in 'LGBMClassifier':
                 model.fit(x_train, y_train.squeeze(),
                           eval_set=[(x_train, y_train), (x_test, y_test)])
+                num_iterations = model._best_iteration
+                params['num_iterations'] = num_iterations
             else:
                 model.fit(x_train, y_train.squeeze())
+
+            print(params)
 
             # Evaluate the model
             predictions = model.predict(x_test)
@@ -37,7 +105,7 @@ def grid_search(estimator, datasets, param_grid):
             recall = recall_score(y_test, predictions, average='weighted')
             precision = precision_score(y_test, predictions, average='weighted')
             f1 = f1_score(y_test, predictions, average='weighted')
-            ll = log_loss(y_test, probabilities)
+            ll = -log_loss(y_test, probabilities)
 
             scores = {'estimator': estimator.__name__,
                       **params,
@@ -82,10 +150,16 @@ def grid_search_regression(dataset, strategy_params):
     else:
         fit_params = {}
 
+    if estimator.__name__ in ('LinearRegression', 'ElasticNet'):
+        scaler = StandardScaler()
+        x_train = scaler.fit_transform(x_train)
+        x_test = scaler.transform(x_test)
+
     # Perform grid search on the filtered training data
     grid_search.fit(x_train, y_train.squeeze(), **fit_params)
 
     # Get the best parameters and the best score from the grid search
     best_params = grid_search.best_params_
+    best_model = grid_search.best_estimator_
 
-    return estimator, best_params
+    return best_model, best_params

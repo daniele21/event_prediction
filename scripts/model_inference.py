@@ -17,10 +17,12 @@ def classification_model_inference(data, dataset_params, class_model, go_live=Fa
 
     datasets = generate_datasets(data, dataset_params)
 
-    for i, dataset in datasets.items():
+    for i_day, dataset in datasets.items():
         x_target = dataset['target']['x']
 
-        probabilities = class_model.predict_proba(x_target)
+        x_target = x_target.drop(['match_day', 'season'], axis=1)
+
+        probabilities = class_model[i_day].predict_proba(x_target)
 
         prob_df = pd.concat((x_target, pd.DataFrame(probabilities, index=x_target.index)), axis=1)
         model_probabilities = pd.concat((model_probabilities, prob_df), axis=0)

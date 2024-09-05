@@ -94,3 +94,25 @@ def check_calibration(data, prob_col, title='', show=True):
         plt.close(fig)
 
     return fig
+
+
+
+# fig = plt.figure(figsize=(10, 6))
+#
+# for x in ["1", "X", "2"]:
+#
+#     a = test_bet_plays[test_bet_plays['choice'] == x][['result_1X2', 'prob']]
+#     a['true'] = (a['result_1X2'] == x).astype(int)
+#
+#     prob_true_rf, prob_pred_rf = calibration_curve(a['true'], a['prob'], n_bins=10)
+#
+#     # Plot reliability diagram
+#     plt.plot(prob_pred_rf, prob_true_rf, marker='o', label=f'{x} | RandomForest (Uncalibrated)')
+#     plt.plot([0, 1], [0, 1], linestyle='--', label='Perfectly Calibrated')
+# plt.xlabel('Mean Predicted Probability')
+# plt.ylabel('Fraction of Positives')
+#
+# plt.title('Calibration Curve (Reliability Diagram)')
+# plt.legend()
+# plt.show()
+# fig.savefig('calibration_check.png')

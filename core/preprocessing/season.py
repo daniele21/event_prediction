@@ -28,6 +28,67 @@ def calculate_team_based_match_day(df):
     return df
 
 
+# def compute_team_stats(df, team_name, match_date, window):
+#     # Filter matches where the team was either home or away
+#     relevant_matches = df[
+#         ((df['HomeTeam'] == team_name) | (df['AwayTeam'] == team_name)) & (df['Date'] < match_date)].copy()
+#
+#     # Assign points based on whether the team was home or away
+#     relevant_matches['Points'] = np.where(
+#         relevant_matches['HomeTeam'] == team_name,
+#         relevant_matches['FTR'].replace({'H': 3, 'D': 1, 'A': 0}),
+#         relevant_matches['FTR'].replace({'A': 3, 'D': 1, 'H': 0})
+#     )
+#
+#     # Assign goals scored and conceded based on whether the team was home or away
+#     relevant_matches['GoalsScored'] = np.where(
+#         relevant_matches['HomeTeam'] == team_name,
+#         relevant_matches['FTHG'],
+#         relevant_matches['FTAG']
+#     )
+#
+#     relevant_matches['GoalsConceded'] = np.where(
+#         relevant_matches['HomeTeam'] == team_name,
+#         relevant_matches['FTAG'],
+#         relevant_matches['FTHG']
+#     )
+#
+#     # Separate home and away matches for form calculations
+#     home_matches = relevant_matches[relevant_matches['HomeTeam'] == team_name]
+#     away_matches = relevant_matches[relevant_matches['AwayTeam'] == team_name]
+#
+#     # Calculate rolling mean and handle empty series cases for overall form
+#     stats = {'OverallPoints': relevant_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
+#         relevant_matches['Points']) >= window else None,
+#              'GoalsScored': relevant_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
+#                  relevant_matches['GoalsScored']) >= window else None,
+#              'GoalsConceded': relevant_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
+#                  relevant_matches['GoalsConceded']) >= window else None, 'GoalDifference':
+#                  (relevant_matches['GoalsScored'] - relevant_matches['GoalsConceded']).rolling(
+#                      window=window).mean().iloc[
+#                      -1] if len(relevant_matches['GoalsScored']) >= window else None,
+#              'HomeFormPoints': home_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
+#                  home_matches['Points']) >= window else None,
+#              'AwayFormPoints': away_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
+#                  away_matches['Points']) >= window else None,
+#              'HomeGoalsScored': home_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
+#                  home_matches['GoalsScored']) >= window else None,
+#              'AwayGoalsScored': away_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
+#                  away_matches['GoalsScored']) >= window else None,
+#              'HomeGoalsConceded': home_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
+#                  home_matches['GoalsConceded']) >= window else None,
+#              'AwayGoalsConceded': away_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
+#                  away_matches['GoalsConceded']) >= window else None, 'HomeGoalDifference':
+#                  (home_matches['GoalsScored'] - home_matches['GoalsConceded']).rolling(window=window).mean().iloc[
+#                      -1] if len(
+#                      home_matches['GoalsScored']) >= window else None, 'AwayGoalDifference':
+#                  (away_matches['GoalsScored'] - away_matches['GoalsConceded']).rolling(window=window).mean().iloc[
+#                      -1] if len(
+#                      away_matches['GoalsScored']) >= window else None}
+#
+#     return stats
+
+
 def compute_team_stats(df, team_name, match_date, window):
     # Filter matches where the team was either home or away
     relevant_matches = df[
@@ -57,42 +118,62 @@ def compute_team_stats(df, team_name, match_date, window):
     home_matches = relevant_matches[relevant_matches['HomeTeam'] == team_name]
     away_matches = relevant_matches[relevant_matches['AwayTeam'] == team_name]
 
-    # Calculate rolling mean and handle empty series cases for overall form
+    # Calculate rolling mean (Moving Average) and Exponential Moving Average (EMA)
     stats = {
-        'OverallPoints': relevant_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
+        # Moving Averages (MA)
+        'OverallPoints_MA': relevant_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
             relevant_matches['Points']) >= window else None,
-        'GoalsScored': relevant_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
+        'GoalsScored_MA': relevant_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
             relevant_matches['GoalsScored']) >= window else None,
-        'GoalsConceded': relevant_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
+        'GoalsConceded_MA': relevant_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
             relevant_matches['GoalsConceded']) >= window else None,
-        'GoalDifference':
-            (relevant_matches['GoalsScored'] - relevant_matches['GoalsConceded']).rolling(window=window).mean().iloc[
-                -1] if len(relevant_matches['GoalsScored']) >= window else None
+        'GoalDifference_MA': (relevant_matches['GoalsScored'] - relevant_matches['GoalsConceded']).rolling(
+            window=window).mean().iloc[-1] if len(relevant_matches['GoalsScored']) >= window else None,
+
+        'HomeFormPoints_MA': home_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
+            home_matches['Points']) >= window else None,
+        'AwayFormPoints_MA': away_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
+            away_matches['Points']) >= window else None,
+        'HomeGoalsScored_MA': home_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
+            home_matches['GoalsScored']) >= window else None,
+        'AwayGoalsScored_MA': away_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
+            away_matches['GoalsScored']) >= window else None,
+        'HomeGoalsConceded_MA': home_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
+            home_matches['GoalsConceded']) >= window else None,
+        'AwayGoalsConceded_MA': away_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
+            away_matches['GoalsConceded']) >= window else None,
+        'HomeGoalDifference_MA': (home_matches['GoalsScored'] - home_matches['GoalsConceded']).rolling(
+            window=window).mean().iloc[-1] if len(home_matches['GoalsScored']) >= window else None,
+        'AwayGoalDifference_MA': (away_matches['GoalsScored'] - away_matches['GoalsConceded']).rolling(
+            window=window).mean().iloc[-1] if len(away_matches['GoalsScored']) >= window else None,
+
+        # Exponential Moving Averages (EMA)
+        'OverallPoints_EMA': relevant_matches['Points'].ewm(span=window, adjust=False).mean().iloc[-1] if len(
+            relevant_matches['Points']) > 0 else None,
+        'GoalsScored_EMA': relevant_matches['GoalsScored'].ewm(span=window, adjust=False).mean().iloc[-1] if len(
+            relevant_matches['GoalsScored']) > 0 else None,
+        'GoalsConceded_EMA': relevant_matches['GoalsConceded'].ewm(span=window, adjust=False).mean().iloc[-1] if len(
+            relevant_matches['GoalsConceded']) > 0 else None,
+        'GoalDifference_EMA': (relevant_matches['GoalsScored'] - relevant_matches['GoalsConceded']).ewm(
+            span=window, adjust=False).mean().iloc[-1] if len(relevant_matches['GoalsScored']) > 0 else None,
+
+        'HomeFormPoints_EMA': home_matches['Points'].ewm(span=window, adjust=False).mean().iloc[-1] if len(
+            home_matches['Points']) > 0 else None,
+        'AwayFormPoints_EMA': away_matches['Points'].ewm(span=window, adjust=False).mean().iloc[-1] if len(
+            away_matches['Points']) > 0 else None,
+        'HomeGoalsScored_EMA': home_matches['GoalsScored'].ewm(span=window, adjust=False).mean().iloc[-1] if len(
+            home_matches['GoalsScored']) > 0 else None,
+        'AwayGoalsScored_EMA': away_matches['GoalsScored'].ewm(span=window, adjust=False).mean().iloc[-1] if len(
+            away_matches['GoalsScored']) > 0 else None,
+        'HomeGoalsConceded_EMA': home_matches['GoalsConceded'].ewm(span=window, adjust=False).mean().iloc[-1] if len(
+            home_matches['GoalsConceded']) > 0 else None,
+        'AwayGoalsConceded_EMA': away_matches['GoalsConceded'].ewm(span=window, adjust=False).mean().iloc[-1] if len(
+            away_matches['GoalsConceded']) > 0 else None,
+        'HomeGoalDifference_EMA': (home_matches['GoalsScored'] - home_matches['GoalsConceded']).ewm(
+            span=window, adjust=False).mean().iloc[-1] if len(home_matches['GoalsScored']) > 0 else None,
+        'AwayGoalDifference_EMA': (away_matches['GoalsScored'] - away_matches['GoalsConceded']).ewm(
+            span=window, adjust=False).mean().iloc[-1] if len(away_matches['GoalsScored']) > 0 else None
     }
-
-    # Calculate home and away form separately
-    stats['HomeFormPoints'] = home_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
-        home_matches['Points']) >= window else None
-    stats['AwayFormPoints'] = away_matches['Points'].rolling(window=window).mean().iloc[-1] if len(
-        away_matches['Points']) >= window else None
-
-    # Calculate home and away goal stats separately
-    stats['HomeGoalsScored'] = home_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
-        home_matches['GoalsScored']) >= window else None
-    stats['AwayGoalsScored'] = away_matches['GoalsScored'].rolling(window=window).mean().iloc[-1] if len(
-        away_matches['GoalsScored']) >= window else None
-
-    stats['HomeGoalsConceded'] = home_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
-        home_matches['GoalsConceded']) >= window else None
-    stats['AwayGoalsConceded'] = away_matches['GoalsConceded'].rolling(window=window).mean().iloc[-1] if len(
-        away_matches['GoalsConceded']) >= window else None
-
-    stats['HomeGoalDifference'] = \
-    (home_matches['GoalsScored'] - home_matches['GoalsConceded']).rolling(window=window).mean().iloc[-1] if len(
-        home_matches['GoalsScored']) >= window else None
-    stats['AwayGoalDifference'] = \
-    (away_matches['GoalsScored'] - away_matches['GoalsConceded']).rolling(window=window).mean().iloc[-1] if len(
-        away_matches['GoalsScored']) >= window else None
 
     return stats
 
@@ -119,37 +200,67 @@ def preprocessing_season_optimized(season_df, season, league_name, windows=None)
             home_stats = compute_team_stats(data, row['HomeTeam'], row['Date'], window)
             away_stats = compute_team_stats(data, row['AwayTeam'], row['Date'], window)
 
-            # Adding home team stats
-            data.at[index, f'HomeTeamOverallForm_{window}'] = home_stats['OverallPoints']
-            data.at[index, f'HomeTeamHomeForm_{window}'] = home_stats['HomeFormPoints']
-            data.at[index, f'HomeTeamAwayForm_{window}'] = home_stats['AwayFormPoints']
-            data.at[index, f'HomeTeamGoalsScored_{window}'] = home_stats['GoalsScored']
-            data.at[index, f'HomeTeamGoalsConceded_{window}'] = home_stats['GoalsConceded']
-            data.at[index, f'HomeTeamGoalDifference_{window}'] = home_stats['GoalDifference']
+            # Adding home team MA stats
+            data.at[index, f'HomeTeamOverallForm_MA_{window}'] = home_stats['OverallPoints_MA']
+            data.at[index, f'HomeTeamHomeForm_MA_{window}'] = home_stats['HomeFormPoints_MA']
+            data.at[index, f'HomeTeamAwayForm_MA_{window}'] = home_stats['AwayFormPoints_MA']
+            data.at[index, f'HomeTeamGoalsScored_MA_{window}'] = home_stats['GoalsScored_MA']
+            data.at[index, f'HomeTeamGoalsConceded_MA_{window}'] = home_stats['GoalsConceded_MA']
+            data.at[index, f'HomeTeamGoalDifference_MA_{window}'] = home_stats['GoalDifference_MA']
 
-            data.at[index, f'HomeTeamHomeGoalsScored_{window}'] = home_stats['HomeGoalsScored']
-            data.at[index, f'HomeTeamAwayGoalsScored_{window}'] = home_stats['AwayGoalsScored']
-            data.at[index, f'HomeTeamHomeGoalsConceded_{window}'] = home_stats['HomeGoalsConceded']
-            data.at[index, f'HomeTeamAwayGoalsConceded_{window}'] = home_stats['AwayGoalsConceded']
-            data.at[index, f'HomeTeamHomeGoalDifference_{window}'] = home_stats['HomeGoalDifference']
-            data.at[index, f'HomeTeamAwayGoalDifference_{window}'] = home_stats['AwayGoalDifference']
+            data.at[index, f'HomeTeamHomeGoalsScored_MA_{window}'] = home_stats['HomeGoalsScored_MA']
+            data.at[index, f'HomeTeamAwayGoalsScored_MA_{window}'] = home_stats['AwayGoalsScored_MA']
+            data.at[index, f'HomeTeamHomeGoalsConceded_MA_{window}'] = home_stats['HomeGoalsConceded_MA']
+            data.at[index, f'HomeTeamAwayGoalsConceded_MA_{window}'] = home_stats['AwayGoalsConceded_MA']
+            data.at[index, f'HomeTeamHomeGoalDifference_MA_{window}'] = home_stats['HomeGoalDifference_MA']
+            data.at[index, f'HomeTeamAwayGoalDifference_MA_{window}'] = home_stats['AwayGoalDifference_MA']
 
-            # Adding away team stats
-            data.at[index, f'AwayTeamOverallForm_{window}'] = away_stats['OverallPoints']
-            data.at[index, f'AwayTeamHomeForm_{window}'] = away_stats['HomeFormPoints']
-            data.at[index, f'AwayTeamAwayForm_{window}'] = away_stats['AwayFormPoints']
-            data.at[index, f'AwayTeamGoalsScored_{window}'] = away_stats['GoalsScored']
-            data.at[index, f'AwayTeamGoalsConceded_{window}'] = away_stats['GoalsConceded']
-            data.at[index, f'AwayTeamGoalDifference_{window}'] = away_stats['GoalDifference']
+            # Adding home team EMA stats
+            data.at[index, f'HomeTeamOverallForm_EMA_{window}'] = home_stats['OverallPoints_EMA']
+            data.at[index, f'HomeTeamHomeForm_EMA_{window}'] = home_stats['HomeFormPoints_EMA']
+            data.at[index, f'HomeTeamAwayForm_EMA_{window}'] = home_stats['AwayFormPoints_EMA']
+            data.at[index, f'HomeTeamGoalsScored_EMA_{window}'] = home_stats['GoalsScored_EMA']
+            data.at[index, f'HomeTeamGoalsConceded_EMA_{window}'] = home_stats['GoalsConceded_EMA']
+            data.at[index, f'HomeTeamGoalDifference_EMA_{window}'] = home_stats['GoalDifference_EMA']
 
-            data.at[index, f'AwayTeamHomeGoalsScored_{window}'] = away_stats['HomeGoalsScored']
-            data.at[index, f'AwayTeamAwayGoalsScored_{window}'] = away_stats['AwayGoalsScored']
-            data.at[index, f'AwayTeamHomeGoalsConceded_{window}'] = away_stats['HomeGoalsConceded']
-            data.at[index, f'AwayTeamAwayGoalsConceded_{window}'] = away_stats['AwayGoalsConceded']
-            data.at[index, f'AwayTeamHomeGoalDifference_{window}'] = away_stats['HomeGoalDifference']
-            data.at[index, f'AwayTeamAwayGoalDifference_{window}'] = away_stats['AwayGoalDifference']
+            data.at[index, f'HomeTeamHomeGoalsScored_EMA_{window}'] = home_stats['HomeGoalsScored_EMA']
+            data.at[index, f'HomeTeamAwayGoalsScored_EMA_{window}'] = home_stats['AwayGoalsScored_EMA']
+            data.at[index, f'HomeTeamHomeGoalsConceded_EMA_{window}'] = home_stats['HomeGoalsConceded_EMA']
+            data.at[index, f'HomeTeamAwayGoalsConceded_EMA_{window}'] = home_stats['AwayGoalsConceded_EMA']
+            data.at[index, f'HomeTeamHomeGoalDifference_EMA_{window}'] = home_stats['HomeGoalDifference_EMA']
+            data.at[index, f'HomeTeamAwayGoalDifference_EMA_{window}'] = home_stats['AwayGoalDifference_EMA']
 
-    data = create_seasonal_features(data.copy())
+            # Adding away team MA stats
+            data.at[index, f'AwayTeamOverallForm_MA_{window}'] = away_stats['OverallPoints_MA']
+            data.at[index, f'AwayTeamHomeForm_MA_{window}'] = away_stats['HomeFormPoints_MA']
+            data.at[index, f'AwayTeamAwayForm_MA_{window}'] = away_stats['AwayFormPoints_MA']
+            data.at[index, f'AwayTeamGoalsScored_MA_{window}'] = away_stats['GoalsScored_MA']
+            data.at[index, f'AwayTeamGoalsConceded_MA_{window}'] = away_stats['GoalsConceded_MA']
+            data.at[index, f'AwayTeamGoalDifference_MA_{window}'] = away_stats['GoalDifference_MA']
+
+            data.at[index, f'AwayTeamHomeGoalsScored_MA_{window}'] = away_stats['HomeGoalsScored_MA']
+            data.at[index, f'AwayTeamAwayGoalsScored_MA_{window}'] = away_stats['AwayGoalsScored_MA']
+            data.at[index, f'AwayTeamHomeGoalsConceded_MA_{window}'] = away_stats['HomeGoalsConceded_MA']
+            data.at[index, f'AwayTeamAwayGoalsConceded_MA_{window}'] = away_stats['AwayGoalsConceded_MA']
+            data.at[index, f'AwayTeamHomeGoalDifference_MA_{window}'] = away_stats['HomeGoalDifference_MA']
+            data.at[index, f'AwayTeamAwayGoalDifference_MA_{window}'] = away_stats['AwayGoalDifference_MA']
+
+            # Adding away team EMA stats
+            data.at[index, f'AwayTeamOverallForm_EMA_{window}'] = away_stats['OverallPoints_EMA']
+            data.at[index, f'AwayTeamHomeForm_EMA_{window}'] = away_stats['HomeFormPoints_EMA']
+            data.at[index, f'AwayTeamAwayForm_EMA_{window}'] = away_stats['AwayFormPoints_EMA']
+            data.at[index, f'AwayTeamGoalsScored_EMA_{window}'] = away_stats['GoalsScored_EMA']
+            data.at[index, f'AwayTeamGoalsConceded_EMA_{window}'] = away_stats['GoalsConceded_EMA']
+            data.at[index, f'AwayTeamGoalDifference_EMA_{window}'] = away_stats['GoalDifference_EMA']
+
+            data.at[index, f'AwayTeamHomeGoalsScored_EMA_{window}'] = away_stats['HomeGoalsScored_EMA']
+            data.at[index, f'AwayTeamAwayGoalsScored_EMA_{window}'] = away_stats['AwayGoalsScored_EMA']
+            data.at[index, f'AwayTeamHomeGoalsConceded_EMA_{window}'] = away_stats['HomeGoalsConceded_EMA']
+            data.at[index, f'AwayTeamAwayGoalsConceded_EMA_{window}'] = away_stats['AwayGoalsConceded_EMA']
+            data.at[index, f'AwayTeamHomeGoalDifference_EMA_{window}'] = away_stats['HomeGoalDifference_EMA']
+            data.at[index, f'AwayTeamAwayGoalDifference_EMA_{window}'] = away_stats['AwayGoalDifference_EMA']
+
+    data = create_seasonal_features(data.copy(), windows)
 
     data = data.rename(columns={'FTHG': 'home_goals',
                                 'FTAG': 'away_goals',
@@ -161,6 +272,7 @@ def preprocessing_season_optimized(season_df, season, league_name, windows=None)
     data['result_1X2'] = data['result_1X2'].apply(encode_result)
 
     return data
+
 
 def encode_result(x):
     if str(x) == "H":
@@ -175,7 +287,7 @@ def encode_result(x):
         raise AttributeError(f'No match result value found for >> {x} << ')
 
 
-def create_seasonal_features(data):
+def create_seasonal_features(data, windows):
     """
     This function takes a DataFrame containing match data and adds three new features:
     - HomeCumulativePoints: The cumulative points of the home team up to each match.
@@ -222,6 +334,22 @@ def create_seasonal_features(data):
     data['HomeCumulativePoints'] = home_cumulative_points
     data['AwayCumulativePoints'] = away_cumulative_points
     data['PointsDifference'] = points_differences
+
+    data['HomePointsPerMatchDay'] = data['HomeCumulativePoints'] / data['match_day']
+    data['AwayPointsPerMatchDay'] = data['AwayCumulativePoints'] / data['match_day']
+    data['PointsDifferencePerMatch'] = data['HomePointsPerMatchDay'] - data['AwayPointsPerMatchDay']
+
+    data['TimeSinceSeasonStart'] = data['MatchDay'] / data['MatchDay'].max()
+    data['SeasonReset'] = (data['MatchDay'] == 1).astype(int)
+
+    for window in windows:
+        data[f'HomeSmoothedPoints_{window}'] = data['HomeCumulativePoints'].ewm(span=window, adjust=False).mean()
+        data[f'AwaySmoothedPoints_{window}'] = data['AwayCumulativePoints'].ewm(span=window, adjust=False).mean()
+        data[f'SmoothedPointsDifference_{window}'] = data['PointsDifference'].ewm(span=window, adjust=False).mean()
+
+    data = data.drop(['HomeCumulativePoints',
+                      'AwayCumulativePoints',
+                      'PointsDifference'], axis=1)
 
     return data
 
