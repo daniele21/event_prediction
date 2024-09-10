@@ -36,8 +36,8 @@ def find_value_bets(prob_estimates, odds):
     value_bets = []
     for i in range(len(prob_estimates)):
         ev = calculate_expected_value(prob_estimates[i], odds[i])
-        if np.any(ev > 0):
-            value_bets.append((i, ev))
+
+        value_bets.append((i, ev))
     return value_bets
 
 
@@ -50,9 +50,15 @@ def kelly_criterion(prob_estimate, odds):
     odds -- La quota offerta dal bookmaker.
 
     Returns:
-    fraction -- La frazione del bankroll da scommettere.
+    fraction -- La frazione del bankroll da scommettere (compresa tra 0 e 1).
     """
-    return (prob_estimate * (odds - 1) - (1 - prob_estimate)) / (odds - 1)
+    kelly_fraction = (prob_estimate * (odds - 1) - (1 - prob_estimate)) / (odds - 1)
+
+    # Se la frazione è negativa, non scommettere (frazione = 0)
+    if kelly_fraction < 0:
+        return 0
+    # Limita la frazione al 100% del bankroll (1)
+    return min(kelly_fraction, 1)
 
 
 def manage_bankroll(fraction, bankroll):
