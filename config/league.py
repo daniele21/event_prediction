@@ -18,7 +18,8 @@ SERIE_A_PATH = [
     'https://www.football-data.co.uk/mmz4281/2021/I1.csv',
     'https://www.football-data.co.uk/mmz4281/2122/I1.csv',
     'https://www.football-data.co.uk/mmz4281/2223/I1.csv',
-    'https://www.football-data.co.uk/mmz4281/2324/I1.csv'
+    'https://www.football-data.co.uk/mmz4281/2324/I1.csv',
+    'https://www.football-data.co.uk/mmz4281/2425/I1.csv'
 ]
 
 #%% PREMIER
