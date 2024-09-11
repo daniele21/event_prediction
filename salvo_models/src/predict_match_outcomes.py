@@ -21,23 +21,7 @@ def cleaning_and_target(df):
     columns_to_drop = ['HomeTeam', 'AwayTeam', 'match_day', 'result_1X2', 'Unnamed: 0', 'Date', 'league',
                        'home_goals', 'away_goals', 'away_points', 'bet_1', 'bet_X', 'bet_2',
                        'season', 'match_n', 'home_points','match_outcome']
-    columns_to_drop1 = ['HomeTeam', 'AwayTeam', 'match_day', 'result_1X2', 'Unnamed: 0', 'Date', 'league',
-                       'home_goals', 'away_goals', 'away_points', 'bet_1', 'bet_X', 'bet_2',
-                       'season', 'match_n', 'home_points', 'match_outcome',
-                       'prev_cum_home_points', 'prev_home_league_points', 'prev_cum_home_goals',
-                       'prev_home_league_goals', 'prev_cum_away_points', 'prev_away_league_points',
-                       'prev_cum_away_goals', 'prev_away_league_goals', 'HOME_last-1-away', 'HOME_last-1',
-                       'AWAY_last-1-home', 'AWAY_last-1', 'AWAY_last-1-away', 'AWAY_last-2',
-                       'HOME_last-1-home', 'HOME_last-2', 'HOME_l   ast-2-away', 'HOME_last-3',
-                       'AWAY_last-2-home', 'AWAY_last-3', 'HOME_last-2-home', 'HOME_last-4',
-                       'AWAY_last-2-away', 'AWAY_last-4', 'HOME_last-3-away', 'HOME_last-5',
-                       'AWAY_last-3-home', 'AWAY_last-5', 'HOME_last-3-home', 'AWAY_last-3-away',
-                       'HOME_last-4-away', 'AWAY_last-4-home', 'HOME_last-4-home', 'AWAY_last-4-away',
-                       'HOME_last-5-away', 'AWAY_last-5-home', 'HOME_last-5-home', 'AWAY_last-5-away',
-                       'point_diff_rolling_mean_3', 'point_diff_rolling_mean_5', 'point_diff_ewm_5',
-                       'point_diff_diff_1', 'point_diff_rolling_std_3', 'point_diff_rolling_std_5',
-                       'point_diff_cumsum', 'goals_diff_rolling_mean_3', 'goals_diff_rolling_mean_5',
-                       'goals_diff_ewm_5', 'goals_diff_diff_1', 'goals_diff_diff_2']
+
 
     df['match_outcome'] = np.where(df['home_goals'] > df['away_goals'], 0,
                                    np.where(df['home_goals'] < df['away_goals'], 2, 1))
@@ -57,7 +41,7 @@ def cleaning_and_target(df):
     return df_cleaned, results, odds
 def cleaning_and_target_(df):
     df = df.copy()
-    df = df.dropna()
+    #df = df.dropna()
 
     columns_to_drop = ['HomeTeam', 'AwayTeam', 'match_day', 'result_1X2', 'Unnamed: 0', 'Date', 'league',
                        'home_goals', 'away_goals', 'away_points', 'bet_1', 'bet_X', 'bet_2',
@@ -334,8 +318,8 @@ def train_and_evaluate_model_with_crossval(df, train, validation, test, epochs=1
     criterion = nn.CrossEntropyLoss()
 
     # Prepara i dati
-    df_train, train_target, _ = cleaning_and_target(df[df['season'].isin(train)])
-    df_test, test_target, odds = cleaning_and_target(df[df['season'].isin(test)])
+    df_train, train_target, _ = cleaning_and_target_(df[df['season'].isin(train)])
+    df_test, test_target, odds = cleaning_and_target_(df[df['season'].isin(test)])
 
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(df_train)

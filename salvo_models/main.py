@@ -68,6 +68,48 @@ def train_models(train,validation,test):
         print("Profitto: ", total_gain / total_cost)
         # print(f"Scommessa sull'evento {i}: {stake} euro")
 
+def train_models_(train,validation,test):
+    # Carica il dataset
+    df = pd.read_csv('./resources/serie_a/serie_a_npm=5_20240730_132753.csv')
+
+    bankroll = 1000
+    #df_expanded = expand_features(df,columns_to_drop)
+    df_expanded = df
+    print("MODELLO CASA SCOMMESSE")
+
+    evaluate_opponent_model(df_expanded[df_expanded['season'].isin(test)])
+
+    print("MODELLO NOSTRO")
+    o, prob, result = train_and_evaluate_model_with_crossval(df_expanded, train, validation, test)
+    mapping = {'1': 0, 'X': 1, '2': 2}
+    calibration_stats = evaluate_calibration(prob, df_expanded[df_expanded['season'].isin(test)]['result_1X2'].map(mapping))
+    print_calibration_results(calibration_stats)
+    total_bet = 0
+    for i, (odds, predicted_probabilities, y_test) in enumerate(zip(o, prob, result)):
+
+        # 1. Identifica scommesse di valore
+        value_bets = find_value_bets(predicted_probabilities, odds)
+
+        # 2. Calcola la frazione da scommettere (Criterio di Kelly)
+        fraction_to_bet = []
+        for j, ev in value_bets:
+            fraction_to_bet.append(kelly_criterion(predicted_probabilities[j], odds[j]))
+        # 3. Determina l'ammontare da scommettere
+        stakes = manage_bankroll(np.array(fraction_to_bet), bankroll)
+
+        total_cost = 0
+        total_gain = 0
+
+        # Esegui le scommesse
+        total_bet, total_cost, total_gain = bet_on_best_value(stakes, total_bet, total_cost, y_test, total_gain, odds)
+        # total_bet, total_cost, total_gain = bet_on_all_value(stakes, total_bet, total_cost, y_test,total_gain, odds)
+        # total_bet, total_cost, total_gain = bet_on_top_two_values(value_bets, stakes, total_bet, total_cost, y_test, total_gain, odds)
+
+        print("Spesa: ", total_cost)
+        print("Guadagno: ", total_gain)
+        print("Profitto: ", total_gain / total_cost)
+        # print(f"Scommessa sull'evento {i}: {stake} euro")
+
 def bet_on_best_value(stakes,total_bet,total_cost,y_test,total_gain,odds):
     bet = max(stakes)
     if bet > 0:
@@ -509,9 +551,8 @@ if __name__ == "__main__":
     validation = [1718]
     test = [2021]
     target = [2122]
-    conn = sqlite3.connect('../input/soccer/database.sqlite')
-    print("ciao")
-    #train_models(train,validation,test)
+
+    train_models(train,validation,test)
     #using_models_only_on_split(target,expected_value,kelly_perentage_request)
     #using_models_same_split(target,expected_value,kelly_perentage_request)
     #using_daniel_models([2324], expected_value, kelly_perentage_request)
